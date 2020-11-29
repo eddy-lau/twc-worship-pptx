@@ -43,7 +43,7 @@ function wrap(line) {
   let firstPart = '';
   let secondPart = '';
 
-  let firstMatch = line.match(/.+[  ,，.。;；]/);
+  let firstMatch = line.substring(0, max_line_length).match(/.+[  ,，.。;；]/);
   if (!firstMatch) {
 
     firstPart = line.substring(0, max_line_length);
