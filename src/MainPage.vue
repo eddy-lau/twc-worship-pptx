@@ -1,7 +1,12 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
     <a class="navbar-brand" href="#"><h4>詩歌PPT製作器</h4><div class="subtitle text-secondary">中華宣道會大圍堂</div></a>
-    <button class="btn btn-success float-right" @click="download()">完成</button>
+    <button class="btn btn-success float-right"
+      :disabled="downloading"
+      @click="download()">
+      <span v-if="downloading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      完成
+    </button>
   </nav>
   <div class="container">
     <div v-for="n in songCount" :key="n" class="card my-4">
@@ -28,7 +33,8 @@ import download from 'downloadjs';
 export default {
   data() {
     return {
-      songCount: 1
+      songCount: 1,
+      downloading: false
     }
   },
   components: {
@@ -53,6 +59,7 @@ export default {
   },
   methods: {
     download() {
+      this.downloading = true;
 
       let pptx = PPTX();
 
@@ -70,8 +77,10 @@ export default {
       });
 
       pptx.saveBlob().then( blob => {
-        console.log('Saved!', blob);
-        download(blob, '詩歌.pptx', blob.type);
+        let mimetype = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+        return download(blob, '詩歌.pptx', mimetype);
+      }).then( () => {
+        this.downloading = false;
       });
 
     }
