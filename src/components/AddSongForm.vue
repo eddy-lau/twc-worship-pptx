@@ -96,22 +96,6 @@ export default {
       this.lyrics = this.formattedLyrics;
     },
     search() {
-
-      let formData = new FormData();
-      formData.append("terms", "%A7%DA%A6V%A7A%C3%AB%A7i");
-      formData.append("boolean", "AND");
-      formData.append("case", "Insensitive");
-
-      let apiKey = 'AIzaSyBnmrZwjO6kmjLxDuH64U9-kWGUVFuAnDA'
-      let cx = '01497debf7236e5fc'
-      let q = '我向你禱告';
-      let query = `key=${apiKey}&cx=${cx}&q=${q}`;
-
-      fetch(`https://www.googleapis.com/customsearch/v1?${query}`)
-      .then( r => r.json() )
-      .then( json => {
-        console.log(json);
-      });
     }
   }
 }
