@@ -78,7 +78,8 @@ export default {
 
       pptx.saveBlob().then( blob => {
         let mimetype = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-        return download(blob, '詩歌.pptx', mimetype);
+        let cloned = new Blob([blob], {type: mimetype});
+        return download(cloned, '詩歌.pptx');
       }).then( () => {
         this.downloading = false;
       });
