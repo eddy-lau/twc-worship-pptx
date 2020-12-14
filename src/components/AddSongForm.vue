@@ -2,13 +2,18 @@
   <form>
     <div class="form-group">
       <label for="songName">歌名</label>
-      <!--
-        <button type="button" class="btn btn-outline-primary btn-sm float-right"
-        @click="search()">搜尋
-        </button>
-      -->
-      <input type="text" class="form-control" id="songName" v-model="name"
-      placeholder="(請貼上歌名)">
+      <div class="input-group">
+        <input type="text" class="form-control" id="songName" v-model="name"
+        placeholder="(請貼上歌名)">
+        <div class="input-group-append">
+          <button class="btn btn-outline-primary"
+            :disabled="isSearching"
+            @click.prevent="search()">
+            <span v-if="isSearching" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            搜尋歌詞
+          </button>
+        </div>
+      </div>
     </div>
     <div class="form-group">
       <label for="lyrics">歌詞</label>
@@ -30,6 +35,8 @@
 
 <script>
 
+import firebase from 'firebase/app';
+import 'firebase/functions';
 const max_line_length = 18;
 
 function wrap(line) {
@@ -76,7 +83,8 @@ export default {
     return {
       name: '',
       copyright: '',
-      lyrics: ''
+      lyrics: '',
+      isSearching: false
     }
   },
   computed: {
@@ -96,6 +104,20 @@ export default {
       this.lyrics = this.formattedLyrics;
     },
     search() {
+      this.isSearching = true;
+      const searchLyrics = firebase.functions().httpsCallable('searchLyrics');
+      searchLyrics(this.name).then( result => {
+        if (result.data && result.data.lyrics) {
+          this.lyrics = result.data.lyrics;
+          this.copyright = result.data.copyright;
+
+          this.formatText();
+          this.isSearching = false;
+        }
+      }).catch( err => {
+        alert(err.toString());
+        this.isSearching = false;
+      })
     }
   }
 }
