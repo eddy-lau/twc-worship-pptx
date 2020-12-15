@@ -7,7 +7,7 @@
         placeholder="(請貼上歌名)">
         <div class="input-group-append">
           <button class="btn btn-outline-primary"
-            :disabled="isSearching"
+            :disabled="isSearching || name === undefined || name.length == 0"
             @click.prevent="search()">
             <span v-if="isSearching" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             搜尋歌詞
@@ -110,10 +110,9 @@ export default {
         if (result.data && result.data.lyrics) {
           this.lyrics = result.data.lyrics;
           this.copyright = result.data.copyright;
-
           this.formatText();
-          this.isSearching = false;
         }
+        this.isSearching = false;
       }).catch( err => {
         alert(err.toString());
         this.isSearching = false;
