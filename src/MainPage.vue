@@ -65,6 +65,7 @@ export default {
 
       if (this.songs.length == 0) {
         alert('請加入最少一首詩歌。');
+        this.downloading = false;
         return;
       }
 
