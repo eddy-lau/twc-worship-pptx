@@ -33,11 +33,39 @@ function addPresentationCover(pres) {
 
 }
 
+function createMasterSlide(pres, title) {
+
+  pres.defineSlideMaster({
+    title: title,
+    objects: [
+      {image:{
+        path:CCMALogo,
+        x: '3%',
+        y: '5%',
+        w: 0.98,
+        h: 0.98
+      }},
+      {image:{
+        path:TWCLogo,
+        x: '85%',
+        y: '5%',
+        w: (186/104)*0.7,
+        h: 0.7,
+      }}
+    ]
+  });
+
+}
+
 function newSlideTemplate(pres) {
 
-  let slide = pres.addSlide();
+  let masterSlideTitle = 'MASTER';
+  createMasterSlide(pres, masterSlideTitle);
+
+  let slide = pres.addSlide({masterName: masterSlideTitle});
   slide.background = { fill: '0000FF' };
 
+  /*
   slide.addImage({
     path:CCMALogo,
     x: '3%',
@@ -53,6 +81,7 @@ function newSlideTemplate(pres) {
     w: (186/104)*0.7,
     h: 0.7,
   });
+  */
 
 
   let h = (1273-946)/(1273-291)*100;
