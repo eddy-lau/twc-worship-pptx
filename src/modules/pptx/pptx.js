@@ -1,32 +1,22 @@
 'use strict';
 import pptxgen from "pptxgenjs";
-import Background from './images/background.jpg';
-import CoverTextBackground from './images/cover_text_background.png';
 import CCMALogo from './images/ccma_logo_white.png';
 import TWCLogo from './images/twc_logo.png';
 
 function addPresentationCover(pres) {
-  let slide = pres.addSlide();
-  slide.background = { path: Background };
 
-  slide.addImage({
-    path:CoverTextBackground,
-    x: '40%',
-    y: '40%',
-    w: '70%',
-    h: '20%'
-  });
+  let slide = newSlideTemplate(pres);
 
   slide.addText('敬拜讚美', {
-     x: '40%', y: '40%', w: '50%', h:'20%',
+     x: '0%', y: '75%', w: '100%', h:'20%',
      align: 'center',
      shrinkText: true,
      bold: true,
-     color: 'FFFF00',
+     color: 'FFC000',
      fontFace: 'Microsoft JhengHei',
-     fontSize: 36,
+     fontSize: 68,
      glow: {size: 10, color: '000000', transparency: 0},
-     shadow: {type:'outer', color: '7F7F7F', opacity: 0.47, angle: 45, blur: 3, offset: 3},
+     shadow: {type:'outer', color: '7F7F7F', opacity: 0.43, angle: 45, blur: 3, offset: 3},
      lang: 'zh-HK'
   });
 
@@ -59,30 +49,8 @@ function createMasterSlide(pres, title) {
 
 function newSlideTemplate(pres) {
 
-  let masterSlideTitle = 'MASTER';
-  createMasterSlide(pres, masterSlideTitle);
-
-  let slide = pres.addSlide({masterName: masterSlideTitle});
+  let slide = pres.addSlide({masterName: 'MASTER'});
   slide.background = { fill: '0000FF' };
-
-  /*
-  slide.addImage({
-    path:CCMALogo,
-    x: '3%',
-    y: '5%',
-    w: 0.8,
-    h: 0.8
-  });
-
-  slide.addImage({
-    path:TWCLogo,
-    x: '85%',
-    y: '5%',
-    w: (186/104)*0.7,
-    h: 0.7,
-  });
-  */
-
 
   let h = (1273-946)/(1273-291)*100;
   let y = 100-h;
@@ -94,7 +62,7 @@ function newSlideTemplate(pres) {
   };
   slide.addShape(pres.ShapeType.rect, {
     ...text_background_dimension,
-    fill: { color: "00FFFF", transparency:53 }
+    fill: { color: "6666FF", transparency:0 }
   });
 
   return slide;
@@ -180,6 +148,9 @@ export default function(fileName) {
 
   let pres = new pptxgen();
   pres.layout = 'LAYOUT_16x9';
+
+  createMasterSlide(pres, 'MASTER');
+
   addPresentationCover(pres);
 
   return {
