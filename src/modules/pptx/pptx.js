@@ -25,8 +25,22 @@ function addPresentationCover(pres) {
 
 function createMasterSlide(pres, title) {
 
+//  let background = { fill: '0000FF' };
+
+  let h = (1273-946)/(1273-291)*100;
+  let y = 100-h;
+  let text_background_dimension = {
+    x: '0%',
+    y: `${y}%`,
+    w: '100%',
+    h: `${h}%`
+  };
+
   pres.defineSlideMaster({
     title: title,
+    background:{
+      fill: '0000FF'
+    },
     objects: [
       {image:{
         path:CCMALogo,
@@ -41,7 +55,11 @@ function createMasterSlide(pres, title) {
         y: '5%',
         w: (186/104)*0.7,
         h: 0.7,
-      }}
+      }},
+      {rect: {
+        ...text_background_dimension,
+        fill: { color: "6666FF", transparency:0 }
+      }}      
     ]
   });
 
@@ -50,21 +68,6 @@ function createMasterSlide(pres, title) {
 function newSlideTemplate(pres) {
 
   let slide = pres.addSlide({masterName: 'MASTER'});
-  slide.background = { fill: '0000FF' };
-
-  let h = (1273-946)/(1273-291)*100;
-  let y = 100-h;
-  let text_background_dimension = {
-    x: '0%',
-    y: `${y}%`,
-    w: '100%',
-    h: `${h}%`
-  };
-  slide.addShape(pres.ShapeType.rect, {
-    ...text_background_dimension,
-    fill: { color: "6666FF", transparency:0 }
-  });
-
   return slide;
 }
 
