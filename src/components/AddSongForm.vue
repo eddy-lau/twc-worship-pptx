@@ -37,7 +37,7 @@
 
 import firebase from 'firebase/app';
 import 'firebase/functions';
-const max_line_length = 18;
+const max_line_length = 20;
 
 function wrap(line) {
 
