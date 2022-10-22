@@ -37,48 +37,11 @@
 
 import firebase from 'firebase/app';
 import 'firebase/functions';
-const max_line_length = 20;
-
-function wrap(line) {
-
-  if (line.length <= max_line_length) {
-    return [line];
-  }
-
-  let lastChar = line.match(/[  ,，.。;；]$/);
-  if (lastChar) {
-    line = line.substring(0, lastChar.index);
-  }
-
-  let result = [];
-
-  let firstPart = '';
-  let secondPart = '';
-
-  let firstMatch = line.substring(0, max_line_length).match(/.+[  ,，.。;；]/);
-  if (!firstMatch) {
-
-    firstPart = line.substring(0, max_line_length);
-    secondPart = line.substring(max_line_length);
-
-  } else {
-
-    firstPart = firstMatch[0];
-    secondPart = line.substring(firstMatch[0].length);
-  }
-
-  if (lastChar) {
-    secondPart = secondPart + lastChar[0];
-  }
-
-  result = result.concat(firstPart);
-  result = result.concat(secondPart);
-
-  return result;
-}
-
 
 export default {
+  props: {
+    textOnTop: {type: Boolean}
+  },
   data() {
     return {
       name: '',
@@ -94,12 +57,51 @@ export default {
         .map( l => l.trim() )
         .filter( l=>l.length > 0)
         .reduce( (r,l) => {
-          return r.concat(wrap(l))
+          return r.concat(this.wrap(l))
         }, [])
       return lines.join('\n');
     }
   },
   methods: {
+    wrap(line) {
+
+      const max_line_length = this.textOnTop ? 13 : 20;
+
+      if (line.length <= max_line_length) {
+        return [line];
+      }
+
+      let lastChar = line.match(/[  ,，.。;；]$/);
+      if (lastChar) {
+        line = line.substring(0, lastChar.index);
+      }
+
+      let result = [];
+
+      let firstPart = '';
+      let secondPart = '';
+
+      let firstMatch = line.substring(0, max_line_length).match(/.+[  ,，.。;；]/);
+      if (!firstMatch) {
+
+        firstPart = line.substring(0, max_line_length);
+        secondPart = line.substring(max_line_length);
+
+      } else {
+
+        firstPart = firstMatch[0];
+        secondPart = line.substring(firstMatch[0].length);
+      }
+
+      if (lastChar) {
+        secondPart = secondPart + lastChar[0];
+      }
+
+      result = result.concat(firstPart);
+      result = result.concat(secondPart);
+
+      return result;
+    },
     formatText() {
       this.lyrics = this.formattedLyrics;
     },

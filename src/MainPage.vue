@@ -9,12 +9,19 @@
     </button>
   </nav>
   <div class="container">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" v-model="textOnTop" id="flexCheckDefault">
+      <label class="form-check-label" for="flexCheckDefault">
+        文字在上方
+      </label>
+    </div>    
+
     <div v-for="n in songCount" :key="n" class="card my-4">
       <div class="card-header">
         <strong>第 {{n}} 首</strong>
       </div>
       <div class="card-body">
-          <add-song-form :ref=" 'addSongForm' + n"/>
+          <add-song-form :ref=" 'addSongForm' + n" :textOnTop="textOnTop"/>
       </div>
       <div v-if="n == songCount" class="card-footer">
         <button class="btn btn-secondary float-right" @click="songCount = songCount + 1">
@@ -34,7 +41,8 @@ export default {
   data() {
     return {
       songCount: 1,
-      downloading: false
+      downloading: false,
+      textOnTop: true,
     }
   },
   components: {
@@ -51,6 +59,7 @@ export default {
         };
         forms.push(data);
       }
+      console.log(forms);
 
       return forms.filter( s => {
         return s.name && s.lyrics
@@ -61,7 +70,7 @@ export default {
     download() {
       this.downloading = true;
 
-      let pptx = PPTX();
+      let pptx = PPTX(this.textOnTop);
 
       if (this.songs.length == 0) {
         alert('請加入最少一首詩歌。');

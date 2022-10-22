@@ -1,14 +1,18 @@
 'use strict';
 import pptxgen from "pptxgenjs";
-import CCMALogo from './images/ccma_logo_white.png';
+import CCMALogo from './images/ccma_twc_logo.png';
 import TWCLogo from './images/twc_logo.png';
 
-function addPresentationCover(pres) {
+//const TEXT_ON_TOP = true;
+
+function addPresentationCover(pres, textOnTop) {
 
   let slide = newSlideTemplate(pres);
 
+  let y = textOnTop ? '5%' : '75%';
+
   slide.addText('敬拜讚美', {
-     x: '0%', y: '75%', w: '100%', h:'20%',
+     x: '0%', y, w: '100%', h:'20%',
      align: 'center',
      shrinkText: true,
      bold: true,
@@ -23,18 +27,19 @@ function addPresentationCover(pres) {
 
 }
 
-function createMasterSlide(pres, title) {
+function createMasterSlide(pres, title, textOnTop) {
 
 //  let background = { fill: '0000FF' };
 
   let h = (1273-946)/(1273-291)*100;
-  let y = 100-h;
+  let y = textOnTop ? 0 : 100-h;
   let text_background_dimension = {
     x: '0%',
     y: `${y}%`,
     w: '100%',
     h: `${h}%`
   };
+  let textBackgroundTransparency = textOnTop ? 100 : 0;
 
   pres.defineSlideMaster({
     title: title,
@@ -45,7 +50,7 @@ function createMasterSlide(pres, title) {
       {image:{
         path:CCMALogo,
         x: '3%',
-        y: '5%',
+        y: '3%',
         w: 0.98,
         h: 0.98
       }},
@@ -58,7 +63,7 @@ function createMasterSlide(pres, title) {
       }},
       {rect: {
         ...text_background_dimension,
-        fill: { color: "6666FF", transparency:0 }
+        fill: { color: "6666FF", transparency:textBackgroundTransparency }
       }}      
     ]
   });
@@ -71,12 +76,16 @@ function newSlideTemplate(pres) {
   return slide;
 }
 
-function addSongCover(pres, name, copyright) {
+function addSongCover(pres, name, copyright, textOnTop) {
 
   let slide = newSlideTemplate(pres);
 
+  let y = textOnTop ? '0%': '67%';
+  let x = textOnTop ? '20%': '5%';
+  let w = textOnTop ? `30%` : '45%';
+
   slide.addText(`【${name}】`, {
-     x: '5%', y: '67%', w: '45%', h:'28%',
+     x, y, w, h:'28%',
      align: 'left',
      shrinkText: true,
      bold: true,
@@ -88,9 +97,10 @@ function addSongCover(pres, name, copyright) {
      lang: 'zh-HK'
   });
 
+  let copyrightWidth = textOnTop ? '30%' : '45%';
   if (copyright) {
     slide.addText(`${copyright}`, {
-       x: '50%', y: '67%', w: '45%', h:'28%',
+       x: '50%', y, w: copyrightWidth, h:'28%',
        align: 'center',
        shrinkText: true,
        bold: true,
@@ -105,12 +115,16 @@ function addSongCover(pres, name, copyright) {
 
 }
 
-function addSlide(pres, text) {
+function addSlide(pres, text, textOnTop) {
 
   let slide = newSlideTemplate(pres);
 
+  let y = textOnTop ? '0%': '67%';
+  let w = textOnTop ? '70%' : '100%';
+  let x = textOnTop ? '15%' : '0%';
+
   slide.addText(text, {
-     x: '0%', y: '67%', w: '100%', h:'28%',
+     x, y, w, h:'28%',
      align: 'center',
      shrinkText: true,
      bold: true,
@@ -123,9 +137,9 @@ function addSlide(pres, text) {
   });
 }
 
-function addSong(pres, name, copyright, lyrics) {
+function addSong(pres, name, copyright, lyrics, textOnTop) {
 
-  addSongCover(pres, name, copyright);
+  addSongCover(pres, name, copyright, textOnTop);
 
   let lines = lyrics.split('\n')
   .map( line => line.trim() )
@@ -142,23 +156,22 @@ function addSong(pres, name, copyright, lyrics) {
         i++;
       }
     }
-    addSlide(pres, text);
+    addSlide(pres, text, textOnTop);
   }
 
 }
 
-export default function(fileName) {
+export default function(textOnTop) {
 
   let pres = new pptxgen();
   pres.layout = 'LAYOUT_16x9';
 
-  createMasterSlide(pres, 'MASTER');
+  createMasterSlide(pres, 'MASTER', textOnTop);
 
-  addPresentationCover(pres);
+  addPresentationCover(pres, textOnTop);
 
   return {
-    addSong: (name, copyright, lyrics) => addSong(pres, name, copyright, lyrics),
-    save: ()=> pres.writeFile(fileName),
+    addSong: (name, copyright, lyrics) => addSong(pres, name, copyright, lyrics, textOnTop),
     saveBlob: () => pres.write('blob')
   }
 }
