@@ -65,7 +65,7 @@ export default {
   methods: {
     wrap(line) {
 
-      const max_line_length = this.textOnTop ? 13 : 20;
+      const max_line_length = this.textOnTop ? 14 : 20;
 
       if (line.length <= max_line_length) {
         return [line];
