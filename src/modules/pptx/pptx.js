@@ -3,7 +3,7 @@ import pptxgen from "pptxgenjs";
 import CCMALogo from './images/ccma_twc_logo.png';
 import TWCLogo from './images/twc_logo.png';
 
-//const TEXT_ON_TOP = true;
+const MAX_LINES_PER_SLIDE = 4;
 
 function addPresentationCover(pres, textOnTop) {
 
@@ -145,19 +145,26 @@ function addSong(pres, name, copyright, lyrics, textOnTop) {
   .map( line => line.trim() )
   .filter( line => line.length > 0 );
 
+  let lineCount = 0;
+  let text;
   for (let i = 0; i<lines.length; i++) {
 
-    let text = lines[i];
-    if (i+1<lines.length) {
-      let nextLine = lines[i+1];
-      if (!nextLine.match(/^[\d副]/)) {
-        text += '\n';
-        text += nextLine;
-        i++;
-      }
+    if (lines[i].match(/^[\d副]/) || lineCount == MAX_LINES_PER_SLIDE) {
+      addSlide(pres, text, textOnTop);
+      text = "";
+      lineCount = 0;
     }
-    addSlide(pres, text, textOnTop);
+
+    if (lineCount == 0) {
+      text = lines[i];
+    } else {
+      text += '\n';
+      text += lines[i];
+    }
+    lineCount++;
+
   }
+  addSlide(pres, text, textOnTop);
 
 }
 
