@@ -32,12 +32,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import AddSongForm from './components/AddSongForm.vue';
 import PPTX from './modules/pptx';
 import download from 'downloadjs';
 
-export default {
+export default defineComponent({
   data() {
     return {
       songCount: 1,
@@ -49,8 +50,11 @@ export default {
     'add-song-form': AddSongForm
   },
   computed: {
-    songs() {
-      let forms = this.$refs.addSongForm.map( f => {
+    addSongForms() {
+      return this.$refs.addSongForm as InstanceType<typeof AddSongForm>[]
+    },
+    songs():{name:string, copyright:string|undefined, lyrics:string}[] {
+      let forms = this.addSongForms.map( f => {
         return {
           name: f.name,
           copyright: f.copyright,
@@ -94,7 +98,7 @@ export default {
 
     }
   }
-}
+})
 </script>
 
 <style scoped>

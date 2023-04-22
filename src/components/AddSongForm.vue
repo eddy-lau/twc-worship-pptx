@@ -33,12 +33,13 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
 
+import { defineComponent } from 'vue'
 import firebase from 'firebase/app';
 import 'firebase/functions';
 
-export default {
+export default defineComponent({
   props: {
     textOnTop: {type: Boolean}
   },
@@ -58,12 +59,12 @@ export default {
         .filter( l=>l.length > 0)
         .reduce( (r,l) => {
           return r.concat(this.wrap(l))
-        }, [])
+        }, [] as string[])
       return lines.join('\n');
     }
   },
   methods: {
-    wrap(line) {
+    wrap(line:string) {
 
       const max_line_length = this.textOnTop ? 14 : 20;
 
@@ -76,7 +77,7 @@ export default {
         line = line.substring(0, lastChar.index);
       }
 
-      let result = [];
+      let result:string[] = [];
 
       let firstPart = '';
       let secondPart = '';
@@ -121,5 +122,5 @@ export default {
       })
     }
   }
-}
+})
 </script>
