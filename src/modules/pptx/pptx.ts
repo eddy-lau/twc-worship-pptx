@@ -5,11 +5,11 @@ import TWCLogo from './images/twc_logo.png';
 
 const MAX_LINES_PER_SLIDE = 4;
 
-function addPresentationCover(pres, textOnTop) {
+function addPresentationCover(pres:pptxgen, textOnTop:boolean) {
 
   let slide = newSlideTemplate(pres);
 
-  let y = textOnTop ? '5%' : '75%';
+  let y:pptxgen.Coord = textOnTop ? '5%' : '75%';
 
   slide.addText('敬拜讚美', {
      x: '0%', y, w: '100%', h:'20%',
@@ -19,7 +19,7 @@ function addPresentationCover(pres, textOnTop) {
      color: 'FFC000',
      fontFace: 'Microsoft JhengHei',
      fontSize: 68,
-     glow: {size: 10, color: '000000', transparency: 0},
+     glow: {size: 10, color: '000000', opacity: 1},
      shadow: {type:'outer', color: '7F7F7F', opacity: 0.43, angle: 45, blur: 3, offset: 3},
      lang: 'zh-HK'
   });
@@ -27,17 +27,17 @@ function addPresentationCover(pres, textOnTop) {
 
 }
 
-function createMasterSlide(pres, title, textOnTop) {
+function createMasterSlide(pres:pptxgen, title:string, textOnTop:boolean) {
 
 //  let background = { fill: '0000FF' };
 
   let h = (1273-946)/(1273-291)*100;
   let y = textOnTop ? 0 : 100-h;
   let text_background_dimension = {
-    x: '0%',
-    y: `${y}%`,
-    w: '100%',
-    h: `${h}%`
+    x: '0%' as pptxgen.Coord,
+    y: `${y}%` as pptxgen.Coord,
+    w: '100%' as pptxgen.Coord,
+    h: `${h}%` as pptxgen.Coord
   };
   let textBackgroundTransparency = textOnTop ? 100 : 0;
 
@@ -70,19 +70,19 @@ function createMasterSlide(pres, title, textOnTop) {
 
 }
 
-function newSlideTemplate(pres) {
+function newSlideTemplate(pres:pptxgen) {
 
   let slide = pres.addSlide({masterName: 'MASTER'});
   return slide;
 }
 
-function addSongCover(pres, name, copyright, textOnTop) {
+function addSongCover(pres:pptxgen, name:string, copyright:string|undefined, textOnTop:boolean) {
 
   let slide = newSlideTemplate(pres);
 
-  let y = textOnTop ? '0%': '67%';
-  let x = textOnTop ? '20%': '5%';
-  let w = textOnTop ? `30%` : '45%';
+  let y:pptxgen.Coord = textOnTop ? '0%': '67%';
+  let x:pptxgen.Coord = textOnTop ? '20%': '5%';
+  let w:pptxgen.Coord = textOnTop ? `30%` : '45%';
 
   slide.addText(`【${name}】`, {
      x, y, w, h:'28%',
@@ -92,12 +92,12 @@ function addSongCover(pres, name, copyright, textOnTop) {
      color: 'FFFFFF',
      fontFace: 'Microsoft JhengHei',
      fontSize: 36,
-     glow: {size: 10, color: '000000', transparency: 0},
+     glow: {size: 10, color: '000000', opacity: 1},
      shadow: {type:'outer', color: '7F7F7F', opacity: 0.47, angle: 45, blur: 3, offset: 3},
      lang: 'zh-HK'
   });
 
-  let copyrightWidth = textOnTop ? '30%' : '45%';
+  let copyrightWidth:pptxgen.Coord = textOnTop ? '30%' : '45%';
   if (copyright) {
     slide.addText(`${copyright}`, {
        x: '50%', y, w: copyrightWidth, h:'28%',
@@ -107,7 +107,7 @@ function addSongCover(pres, name, copyright, textOnTop) {
        color: 'FFFFFF',
        fontFace: 'Microsoft JhengHei',
        fontSize: 24,
-       glow: {size: 10, color: '000000', transparency: 0},
+       glow: {size: 10, color: '000000', opacity: 1},
        shadow: {type:'outer', color: '7F7F7F', opacity: 0.47, angle: 45, blur: 3, offset: 3},
        lang: 'zh-HK'
     });
@@ -115,13 +115,13 @@ function addSongCover(pres, name, copyright, textOnTop) {
 
 }
 
-function addSlide(pres, text, textOnTop) {
+function addSlide(pres:pptxgen, text:string, textOnTop:boolean) {
 
   let slide = newSlideTemplate(pres);
 
-  let y = textOnTop ? '0%': '67%';
-  let w = textOnTop ? '70%' : '100%';
-  let x = textOnTop ? '15%' : '0%';
+  let y:pptxgen.Coord = textOnTop ? '0%': '67%';
+  let w:pptxgen.Coord = textOnTop ? '70%' : '100%';
+  let x:pptxgen.Coord = textOnTop ? '15%' : '0%';
 
   slide.addText(text, {
      x, y, w, h:'28%',
@@ -131,13 +131,13 @@ function addSlide(pres, text, textOnTop) {
      color: 'FFFFFF',
      fontFace: 'Microsoft JhengHei',
      fontSize: 36,
-     glow: {size: 10, color: '000000', transparency: 0},
+     glow: {size: 10, color: '000000', opacity: 1},
      shadow: {type:'outer', color: '7F7F7F', opacity: 0.47, angle: 45, blur: 3, offset: 3},
      lang: 'zh-HK'
   });
 }
 
-function addSong(pres, name, copyright, lyrics, textOnTop) {
+function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:string, textOnTop:boolean) {
 
   addSongCover(pres, name, copyright, textOnTop);
 
@@ -150,7 +150,9 @@ function addSong(pres, name, copyright, lyrics, textOnTop) {
   for (let i = 0; i<lines.length; i++) {
 
     if (lines[i].match(/^[\d副]/) || lineCount == MAX_LINES_PER_SLIDE) {
-      addSlide(pres, text, textOnTop);
+      if (text) {
+        addSlide(pres, text, textOnTop);
+      }
       text = "";
       lineCount = 0;
     }
@@ -164,11 +166,14 @@ function addSong(pres, name, copyright, lyrics, textOnTop) {
     lineCount++;
 
   }
-  addSlide(pres, text, textOnTop);
+
+  if (text) {
+    addSlide(pres, text, textOnTop);
+  }
 
 }
 
-export default function(textOnTop) {
+export default function(textOnTop:boolean) {
 
   let pres = new pptxgen();
   pres.layout = 'LAYOUT_16x9';
@@ -178,7 +183,7 @@ export default function(textOnTop) {
   addPresentationCover(pres, textOnTop);
 
   return {
-    addSong: (name, copyright, lyrics) => addSong(pres, name, copyright, lyrics, textOnTop),
-    saveBlob: () => pres.write('blob')
+    addSong: (name:string, copyright:string|undefined, lyrics:string) => addSong(pres, name, copyright, lyrics, textOnTop),
+    saveBlob: () => pres.write({outputType:'blob'})
   }
 }

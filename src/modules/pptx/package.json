@@ -1,4 +1,4 @@
 {
   "name": "pptx",
-  "main": "pptx.js"
+  "main": "pptx.ts"
 }
