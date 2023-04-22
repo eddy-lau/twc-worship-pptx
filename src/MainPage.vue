@@ -21,7 +21,7 @@
         <strong>第 {{n}} 首</strong>
       </div>
       <div class="card-body">
-          <add-song-form :ref=" 'addSongForm' + n" :textOnTop="textOnTop"/>
+          <add-song-form ref="addSongForm" :textOnTop="textOnTop"/>
       </div>
       <div v-if="n == songCount" class="card-footer">
         <button class="btn btn-secondary float-right" @click="songCount = songCount + 1">
@@ -50,15 +50,13 @@ export default {
   },
   computed: {
     songs() {
-      let forms = [];
-      for (let i = 1; i<=this.songCount; i++) {
-        let data = {
-          name: this.$refs['addSongForm'+i].name,
-          copyright: this.$refs['addSongForm'+i].copyright,
-          lyrics: this.$refs['addSongForm'+i].formattedLyrics,
-        };
-        forms.push(data);
-      }
+      let forms = this.$refs.addSongForm.map( f => {
+        return {
+          name: f.name,
+          copyright: f.copyright,
+          lyrics: f.lyrics
+        }
+      });
       console.log(forms);
 
       return forms.filter( s => {
