@@ -1,7 +1,8 @@
 import { createApp } from 'vue'
+import './style.css'
 import App from './App.vue'
 import firebase from 'firebase/app';
-import 'firebase/analytics';
+//import 'firebase/analytics';
 
 var firebaseConfig = {
     apiKey: "AIzaSyD82Fj6-PkcMTD3IQ7w1631t5XpBwpNJRY",
@@ -14,6 +15,6 @@ var firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-firebase.analytics();
+//firebase.analytics();
 
 createApp(App).mount('#app')
