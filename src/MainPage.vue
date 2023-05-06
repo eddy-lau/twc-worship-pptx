@@ -37,17 +37,16 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import AddSongForm from './components/AddSongForm.vue';
-import PPTX from './modules/pptx';
+import { PPTX, TEMPLATES } from './modules/pptx';
 import download from 'downloadjs';
-import { Templates } from './modules/pptx/Template';
 
 export default defineComponent({
   data() {
     return {
       songCount: 1,
       downloading: false,
-      template: ref(Templates[0]),
-      templates: Templates
+      template: ref(TEMPLATES[0]),
+      templates: TEMPLATES
     }
   },
   components: {
@@ -73,10 +72,10 @@ export default defineComponent({
     }
   },
   methods: {
-    download() {
+    async download() {
       this.downloading = true;
 
-      let pptx = PPTX(this.template);
+      let pptx = new PPTX(this.template);
 
       if (this.songs.length == 0) {
         alert('請加入最少一首詩歌。');
@@ -92,13 +91,11 @@ export default defineComponent({
         );
       });
 
-      pptx.saveBlob().then( blob => {
-        let mimetype = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-        let cloned = new Blob([blob], {type: mimetype});
-        return download(cloned, '詩歌.pptx');
-      }).then( () => {
-        this.downloading = false;
-      });
+      const blob = await pptx.saveBlob()
+      let mimetype = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+      let cloned = new Blob([blob], {type: mimetype});
+      download(cloned, '詩歌.pptx');
+      this.downloading = false;
 
     }
   }

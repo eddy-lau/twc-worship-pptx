@@ -163,17 +163,28 @@ function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:s
 
 }
 
-export default function(template:Template) {
+export class PPTX {
 
-  let pres = new pptxgen();
-  pres.layout = 'LAYOUT_16x9';
+  template:Template
+  pres:pptxgen
 
-  createMasterSlide(pres, 'MASTER', template);
+  constructor(template:Template) {
+    this.template = template
+    this.pres = new pptxgen()
 
-  addPresentationCover(pres, template);
+    this.pres.layout = 'LAYOUT_16x9';
 
-  return {
-    addSong: (name:string, copyright:string|undefined, lyrics:string) => addSong(pres, name, copyright, lyrics, template),
-    saveBlob: () => pres.write({outputType:'blob'})
+    createMasterSlide(this.pres, 'MASTER', template);
+    addPresentationCover(this.pres, template);
+  
   }
+
+  addSong(name:string, copyright:string|undefined, lyrics:string) {
+    addSong(this.pres, name, copyright, lyrics, this.template)
+  }
+
+  async saveBlob():Promise<string | ArrayBuffer | Blob | Uint8Array> {
+    return this.pres.write({outputType:'blob'})
+  }
+
 }
