@@ -10,9 +10,9 @@
   </nav>
   <div class="container">
     <div class="form-check">
-      <div v-for="t in templates">
-        <input class="form-check-input" type="radio" :value="t" v-model="template" id="flexCheckDefault">
-        <label class="form-check-label" for="flexCheckDefault">
+      <div v-for="(t, i) in templates">
+        <input class="form-check-input" type="radio" :value="t" v-model="template" :id="`flexCheckDefault${i}`">
+        <label class="form-check-label" :for="`flexCheckDefault${i}`">
           {{t.name}}
         </label>
       </div>

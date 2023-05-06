@@ -42,7 +42,7 @@ const FOUR_LINES_TEMPLATE: Template = {
       y: '0%',
       w: '70%',
       x: '15%',
-      h: '28%'
+      h: '50%'
   },
   lyricsMaxLineLength: 14
 }
