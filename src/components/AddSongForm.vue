@@ -35,13 +35,14 @@
 
 <script lang="ts">
 
-import { defineComponent } from 'vue'
+import { PropType, defineComponent } from 'vue'
 import firebase from 'firebase/app';
 import 'firebase/functions';
+import { Template } from '../modules/pptx/Template';
 
 export default defineComponent({
   props: {
-    textOnTop: {type: Boolean}
+    template: Object as PropType<Template>
   },
   data() {
     return {
@@ -65,8 +66,10 @@ export default defineComponent({
   },
   methods: {
     wrap(line:string) {
-
-      const max_line_length = this.textOnTop ? 14 : 20;
+      if (!this.template) {
+        return ''
+      }
+      const max_line_length = this.template.lyricsMaxLineLength
 
       if (line.length <= max_line_length) {
         return [line];

@@ -2,14 +2,13 @@
 import pptxgen from "pptxgenjs";
 import CCMALogo from './images/ccma_twc_logo.png';
 import TWCLogo from './images/twc_logo.png';
+import { Template } from "./Template";
 
-const MAX_LINES_PER_SLIDE = 4;
-
-function addPresentationCover(pres:pptxgen, textOnTop:boolean) {
+function addPresentationCover(pres:pptxgen, template:Template) {
 
   let slide = newSlideTemplate(pres);
 
-  let y:pptxgen.Coord = textOnTop ? '5%' : '75%';
+  let y:pptxgen.Coord = template.coverTitleY
 
   slide.addText('敬拜讚美', {
      x: '0%', y, w: '100%', h:'20%',
@@ -27,19 +26,19 @@ function addPresentationCover(pres:pptxgen, textOnTop:boolean) {
 
 }
 
-function createMasterSlide(pres:pptxgen, title:string, textOnTop:boolean) {
+function createMasterSlide(pres:pptxgen, title:string, template:Template) {
 
 //  let background = { fill: '0000FF' };
 
   let h = (1273-946)/(1273-291)*100;
-  let y = textOnTop ? 0 : 100-h;
+  let y = template.masterTextY
   let text_background_dimension = {
     x: '0%' as pptxgen.Coord,
     y: `${y}%` as pptxgen.Coord,
     w: '100%' as pptxgen.Coord,
     h: `${h}%` as pptxgen.Coord
   };
-  let textBackgroundTransparency = textOnTop ? 100 : 0;
+  let textBackgroundTransparency = template.lyricsBackgroundTransparency
 
   pres.defineSlideMaster({
     title: title,
@@ -76,16 +75,12 @@ function newSlideTemplate(pres:pptxgen) {
   return slide;
 }
 
-function addSongCover(pres:pptxgen, name:string, copyright:string|undefined, textOnTop:boolean) {
+function addSongCover(pres:pptxgen, name:string, copyright:string|undefined, template:Template) {
 
   let slide = newSlideTemplate(pres);
 
-  let y:pptxgen.Coord = textOnTop ? '0%': '67%';
-  let x:pptxgen.Coord = textOnTop ? '20%': '5%';
-  let w:pptxgen.Coord = textOnTop ? `30%` : '45%';
-
   slide.addText(`【${name}】`, {
-     x, y, w, h:'28%',
+     ...template.songNameCoords,
      align: 'left',
      shrinkText: true,
      bold: true,
@@ -97,10 +92,9 @@ function addSongCover(pres:pptxgen, name:string, copyright:string|undefined, tex
      lang: 'zh-HK'
   });
 
-  let copyrightWidth:pptxgen.Coord = textOnTop ? '30%' : '45%';
   if (copyright) {
     slide.addText(`${copyright}`, {
-       x: '50%', y, w: copyrightWidth, h:'28%',
+       ...template.copyrightCoords,
        align: 'center',
        shrinkText: true,
        bold: true,
@@ -115,16 +109,12 @@ function addSongCover(pres:pptxgen, name:string, copyright:string|undefined, tex
 
 }
 
-function addSlide(pres:pptxgen, text:string, textOnTop:boolean) {
+function addSlide(pres:pptxgen, text:string, template:Template) {
 
   let slide = newSlideTemplate(pres);
 
-  let y:pptxgen.Coord = textOnTop ? '0%': '67%';
-  let w:pptxgen.Coord = textOnTop ? '70%' : '100%';
-  let x:pptxgen.Coord = textOnTop ? '15%' : '0%';
-
   slide.addText(text, {
-     x, y, w, h:'28%',
+     ...template.lyricsCoords,
      align: 'center',
      shrinkText: true,
      bold: true,
@@ -137,9 +127,9 @@ function addSlide(pres:pptxgen, text:string, textOnTop:boolean) {
   });
 }
 
-function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:string, textOnTop:boolean) {
+function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:string, template:Template) {
 
-  addSongCover(pres, name, copyright, textOnTop);
+  addSongCover(pres, name, copyright, template);
 
   let lines = lyrics.split('\n')
   .map( line => line.trim() )
@@ -149,9 +139,9 @@ function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:s
   let text;
   for (let i = 0; i<lines.length; i++) {
 
-    if (lines[i].match(/^[\d副]/) || lineCount == MAX_LINES_PER_SLIDE) {
+    if (lines[i].match(/^[\d副]/) || lineCount == template.maxLinesPerSlide) {
       if (text) {
-        addSlide(pres, text, textOnTop);
+        addSlide(pres, text, template);
       }
       text = "";
       lineCount = 0;
@@ -168,22 +158,22 @@ function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:s
   }
 
   if (text) {
-    addSlide(pres, text, textOnTop);
+    addSlide(pres, text, template);
   }
 
 }
 
-export default function(textOnTop:boolean) {
+export default function(template:Template) {
 
   let pres = new pptxgen();
   pres.layout = 'LAYOUT_16x9';
 
-  createMasterSlide(pres, 'MASTER', textOnTop);
+  createMasterSlide(pres, 'MASTER', template);
 
-  addPresentationCover(pres, textOnTop);
+  addPresentationCover(pres, template);
 
   return {
-    addSong: (name:string, copyright:string|undefined, lyrics:string) => addSong(pres, name, copyright, lyrics, textOnTop),
+    addSong: (name:string, copyright:string|undefined, lyrics:string) => addSong(pres, name, copyright, lyrics, template),
     saveBlob: () => pres.write({outputType:'blob'})
   }
 }

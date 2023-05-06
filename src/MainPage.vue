@@ -10,10 +10,12 @@
   </nav>
   <div class="container">
     <div class="form-check">
-      <input class="form-check-input" type="checkbox" v-model="textOnTop" id="flexCheckDefault">
-      <label class="form-check-label" for="flexCheckDefault">
-        文字在上方
-      </label>
+      <div v-for="t in templates">
+        <input class="form-check-input" type="radio" :value="t" v-model="template" id="flexCheckDefault">
+        <label class="form-check-label" for="flexCheckDefault">
+          {{t.name}}
+        </label>
+      </div>
     </div>    
 
     <div v-for="n in songCount" :key="n" class="card my-4">
@@ -21,7 +23,7 @@
         <strong>第 {{n}} 首</strong>
       </div>
       <div class="card-body">
-          <add-song-form ref="addSongForm" :textOnTop="textOnTop"/>
+          <add-song-form ref="addSongForm" :template="template"/>
       </div>
       <div v-if="n == songCount" class="card-footer">
         <button class="btn btn-secondary float-right" @click="songCount = songCount + 1">
@@ -33,17 +35,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import AddSongForm from './components/AddSongForm.vue';
 import PPTX from './modules/pptx';
 import download from 'downloadjs';
+import { Templates } from './modules/pptx/Template';
 
 export default defineComponent({
   data() {
     return {
       songCount: 1,
       downloading: false,
-      textOnTop: true,
+      template: ref(Templates[0]),
+      templates: Templates
     }
   },
   components: {
@@ -72,7 +76,7 @@ export default defineComponent({
     download() {
       this.downloading = true;
 
-      let pptx = PPTX(this.textOnTop);
+      let pptx = PPTX(this.template);
 
       if (this.songs.length == 0) {
         alert('請加入最少一首詩歌。');
