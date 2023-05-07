@@ -33,97 +33,87 @@
   </form>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 
-import { PropType, defineComponent } from 'vue'
+import { ref } from 'vue'
 import firebase from 'firebase/app';
 import 'firebase/functions';
 import { Template } from '../modules/pptx/Template';
 
-export default defineComponent({
-  props: {
-    template: Object as PropType<Template>
-  },
-  data() {
-    return {
-      name: '',
-      copyright: '',
-      lyrics: '',
-      isSearching: false
-    }
-  },
-  computed: {
-    formattedLyrics() {
-      let lines = this.lyrics.split('\n');
-      lines = lines
-        .map( l => l.trim() )
-        .filter( l=>l.length > 0)
-        .reduce( (r,l) => {
-          return r.concat(this.wrap(l))
-        }, [] as string[])
-      return lines.join('\n');
-    }
-  },
-  methods: {
-    wrap(line:string) {
-      if (!this.template) {
-        return ''
-      }
-      const max_line_length = this.template.lyricsMaxLineLength
+const props = defineProps<{template:Template}>()
+const name = ref('')
+const copyright = ref('')
+const lyrics = ref('')
+const isSearching = ref(false)
 
-      if (line.length <= max_line_length) {
-        return [line];
-      }
-
-      let lastChar = line.match(/[  ,，.。;；]$/);
-      if (lastChar) {
-        line = line.substring(0, lastChar.index);
-      }
-
-      let result:string[] = [];
-
-      let firstPart = '';
-      let secondPart = '';
-
-      let firstMatch = line.substring(0, max_line_length).match(/.+[  ,，.。;；]/);
-      if (!firstMatch) {
-
-        firstPart = line.substring(0, max_line_length);
-        secondPart = line.substring(max_line_length);
-
-      } else {
-
-        firstPart = firstMatch[0];
-        secondPart = line.substring(firstMatch[0].length);
-      }
-
-      if (lastChar) {
-        secondPart = secondPart + lastChar[0];
-      }
-
-      result = result.concat(firstPart);
-      result = result.concat(secondPart);
-
-      return result;
-    },
-    formatText() {
-      this.lyrics = this.formattedLyrics;
-    },
-    search() {
-      this.isSearching = true;
-      const searchLyrics = firebase.functions().httpsCallable('searchLyrics');
-      searchLyrics(this.name).then( result => {
-        if (result.data && result.data.lyrics) {
-          this.lyrics = result.data.lyrics;
-          this.copyright = result.data.copyright;
-          this.formatText();
-        }
-        this.isSearching = false;
-      }).catch( err => {
-        alert(err.toString());
-        this.isSearching = false;
-      })
-    }
+const wrap = (line:string) => {
+  if (!props.template) {
+    return ''
   }
-})
+  const max_line_length = props.template.lyricsMaxLineLength
+
+  if (line.length <= max_line_length) {
+    return [line];
+  }
+
+  let lastChar = line.match(/[  ,，.。;；]$/);
+  if (lastChar) {
+    line = line.substring(0, lastChar.index);
+  }
+
+  let result:string[] = [];
+
+  let firstPart = '';
+  let secondPart = '';
+
+  let firstMatch = line.substring(0, max_line_length).match(/.+[  ,，.。;；]/);
+  if (!firstMatch) {
+
+    firstPart = line.substring(0, max_line_length);
+    secondPart = line.substring(max_line_length);
+
+  } else {
+
+    firstPart = firstMatch[0];
+    secondPart = line.substring(firstMatch[0].length);
+  }
+
+  if (lastChar) {
+    secondPart = secondPart + lastChar[0];
+  }
+
+  result = result.concat(firstPart);
+  result = result.concat(secondPart);
+
+  return result;
+}
+
+const formatText = () => {
+  let lines = lyrics.value.split('\n');
+  lines = lines
+    .map( l => l.trim() )
+    .filter( l=>l.length > 0)
+    .reduce( (r,l) => {
+      return r.concat(wrap(l))
+    }, [] as string[])
+  lyrics.value = lines.join('\n');
+}
+
+const search = () => {
+  isSearching.value = true;
+  const searchLyrics = firebase.functions().httpsCallable('searchLyrics');
+  searchLyrics(name.value).then( result => {
+    if (result.data && result.data.lyrics) {
+      lyrics.value = result.data.lyrics;
+      copyright.value = result.data.copyright;
+      formatText();
+    }
+    isSearching.value = false;
+  }).catch( err => {
+    alert(err.toString());
+    isSearching.value = false;
+  })
+}
+
+defineExpose({name, lyrics, copyright})
 </script>
