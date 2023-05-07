@@ -23,7 +23,7 @@
         <strong>第 {{n}} 首</strong>
       </div>
       <div class="card-body">
-          <add-song-form ref="addSongForm" :template="template"/>
+          <add-song-form ref="addSongForms" :template="template"/>
       </div>
       <div v-if="n == songCount" class="card-footer">
         <button class="btn btn-secondary float-right" @click="songCount = songCount + 1">
@@ -34,72 +34,48 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import AddSongForm from './components/AddSongForm.vue';
 import { PPTX, TEMPLATES } from './modules/pptx';
-import download from 'downloadjs';
+import downloadjs from 'downloadjs';
 
-export default defineComponent({
-  data() {
-    return {
-      songCount: 1,
-      downloading: false,
-      template: ref(TEMPLATES[0]),
-      templates: TEMPLATES
-    }
-  },
-  components: {
-    'add-song-form': AddSongForm
-  },
-  computed: {
-    addSongForms() {
-      return this.$refs.addSongForm as InstanceType<typeof AddSongForm>[]
-    },
-    songs():{name:string, copyright:string|undefined, lyrics:string}[] {
-      let forms = this.addSongForms.map( f => {
-        return {
-          name: f.name,
-          copyright: f.copyright,
-          lyrics: f.lyrics
-        }
-      });
-      console.log(forms);
+const songCount = ref(1)
+const downloading = ref(false)
+const template = ref(TEMPLATES[0])
+const templates = TEMPLATES
+const addSongForms = ref<InstanceType<typeof AddSongForm>[]>()
 
-      return forms.filter( s => {
-        return s.name && s.lyrics
-      });
-    }
-  },
-  methods: {
-    async download() {
-      this.downloading = true;
+const download = async () => {
 
-      let pptx = new PPTX(this.template);
-
-      if (this.songs.length == 0) {
-        alert('請加入最少一首詩歌。');
-        this.downloading = false;
-        return;
-      }
-
-      this.songs.forEach( s => {
-        pptx.addSong(
-          s.name,
-          s.copyright,
-          s.lyrics
-        );
-      });
-
-      const blob = await pptx.saveBlob()
-      let mimetype = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-      let cloned = new Blob([blob], {type: mimetype});
-      download(cloned, '詩歌.pptx');
-      this.downloading = false;
-
-    }
+  if (!addSongForms.value) {
+    return
   }
-})
+
+  const songs = addSongForms.value.map( f => {
+    return {
+      name: f.name,
+      copyright: f.copyright,
+      lyrics: f.lyrics
+    }
+  }).filter( s => s.name && s.lyrics )
+
+  if (songs.length == 0) {
+    alert('請加入最少一首詩歌。');
+    return;
+  }
+
+  let pptx = new PPTX(template.value)
+  songs.forEach( s => pptx.addSong(s) )
+
+  downloading.value = true;
+  const blob = await pptx.saveBlob()
+  let mimetype = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+  let cloned = new Blob([blob], {type: mimetype});
+  downloadjs(cloned, '詩歌.pptx');
+  downloading.value = false;
+
+}
 </script>
 
 <style scoped>

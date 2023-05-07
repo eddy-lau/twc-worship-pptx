@@ -179,8 +179,8 @@ export class PPTX {
   
   }
 
-  addSong(name:string, copyright:string|undefined, lyrics:string) {
-    addSong(this.pres, name, copyright, lyrics, this.template)
+  addSong(song:{name:string, copyright:string|undefined, lyrics:string}) {
+    addSong(this.pres, song.name, song.copyright, song.lyrics, this.template)
   }
 
   async saveBlob():Promise<string | ArrayBuffer | Blob | Uint8Array> {
