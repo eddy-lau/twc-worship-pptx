@@ -1,5 +1,5 @@
-import { PPTX } from './PPTX'
+import { PPTGenerator } from './PPTGenerator'
 import { TEMPLATES, Template } from './Template'
 
-export { PPTX, TEMPLATES }
+export { PPTGenerator, TEMPLATES }
 export type { Template };

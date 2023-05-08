@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import AddSongForm from './components/AddSongForm.vue';
-import { PPTX, TEMPLATES } from './modules/pptx';
+import { PPTGenerator, TEMPLATES } from './modules/pptx';
 import downloadjs from 'downloadjs';
 
 const songCount = ref(1)
@@ -65,7 +65,7 @@ const download = async () => {
     return;
   }
 
-  let pptx = new PPTX(template.value)
+  let pptx = new PPTGenerator(template.value)
   songs.forEach( s => pptx.addSong(s) )
 
   downloading.value = true;

@@ -163,7 +163,7 @@ function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:s
 
 }
 
-export class PPTX {
+export class PPTGenerator {
 
   template:Template
   pres:pptxgen
