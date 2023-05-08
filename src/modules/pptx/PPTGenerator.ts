@@ -81,7 +81,7 @@ function addSongCover(pres:pptxgen, name:string, copyright:string|undefined, tem
 
   slide.addText(`【${name}】`, {
      ...template.songNameCoords,
-     align: 'left',
+     align: 'center',
      shrinkText: true,
      bold: true,
      color: 'FFFFFF',

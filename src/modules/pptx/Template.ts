@@ -26,8 +26,8 @@ export const TEMPLATES:Template[] = [
   coverTitleY:'5%',
   masterTextY: '0%',
   lyricsBackgroundTransparency: 100,
-  songNameCoords:  { x: '20%', y: '0%', w: `30%`, h: '28%' },
-  copyrightCoords: { x: '50%', y: '0%', w: '30%', h: '28%' },
+  songNameCoords:  { x: '20%', y: '0%', w: `60%`, h: '15%' },
+  copyrightCoords: { x: '20%', y: '15%', w: '60%', h: '20%' },
   lyricsCoords:    { x: '15%', y: '0%', w: '70%', h: '50%' },
   lyricsMaxLineLength: 14
 },
@@ -38,8 +38,8 @@ export const TEMPLATES:Template[] = [
   coverTitleY: '5%',
   masterTextY: '0%',
   lyricsBackgroundTransparency: 100,
-  songNameCoords:  { x: '20%', y: '0%', w: `30%`, h: '28%' },
-  copyrightCoords: { x: '50%', y: '0%', w: '30%', h: '28%' },
+  songNameCoords:  { x: '20%', y: '0%', w: `60%`, h: '15%' },
+  copyrightCoords: { x: '20%', y: '15%', w: '60%', h: '20%' },
   lyricsCoords:    { x: '15%', y: '0%', w: '70%', h: '28%' },
   lyricsMaxLineLength: 14
 },
@@ -50,8 +50,8 @@ export const TEMPLATES:Template[] = [
   coverTitleY:'75%',
   masterTextY: `66%`,
   lyricsBackgroundTransparency:0,
-  songNameCoords:  { x: '5%',  y: '67%', w: '45%',  h: '28%' },
-  copyrightCoords: { x: '50%', y: '67%', w: '45%',  h: '28%' },
+  songNameCoords:  { x: '20%', y: '0%', w: `60%`, h: '15%' },
+  copyrightCoords: { x: '20%', y: '15%', w: '60%', h: '20%' },
   lyricsCoords:    { x: '0%',  y: '67%', w: '100%', h: '28%' },
   lyricsMaxLineLength: 20
 }
