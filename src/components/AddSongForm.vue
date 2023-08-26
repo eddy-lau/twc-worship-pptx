@@ -22,6 +22,8 @@
         rows="10"></textarea>
       <button type="button" class="btn btn-outline-primary btn-sm float-right my-1"
       @click="formatText()">整理歌詞</button>
+      <button type="button" class="btn btn-outline-primary btn-sm float-right my-1 mx-2"
+      @click="replaceChar()">你 > 祢</button>
     </div>
     <div class="form-group">
       <label for="copyright">版權</label>
@@ -97,6 +99,10 @@ const formatText = () => {
       return r.concat(wrap(l))
     }, [] as string[])
   lyrics.value = lines.join('\n');
+}
+
+const replaceChar = () => {
+  lyrics.value = lyrics.value.replaceAll('你', '祢')
 }
 
 const search = () => {
