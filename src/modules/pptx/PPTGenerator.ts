@@ -113,8 +113,36 @@ function addSlide(pres:pptxgen, text:string, template:Template) {
 
   let slide = newSlideTemplate(pres);
 
+  const markers:{[key:string]:string} = {
+    'b': 'Bridge',
+    'B': 'Bridge',
+    'c': '副歌',
+    'C': '副歌'
+  }
+
+  let markerHeight = 0;
+  if (text.match(/^[a-zA-Z]/) && template.markerCoords) {
+
+    slide.addText(markers[text.charAt(0)], {
+      ...template.markerCoords,
+      align: 'center',
+      shrinkText: true,
+      bold: true,
+      color: 'FFFFFF',
+      fontFace: 'Microsoft JhengHei',
+      fontSize: 22,
+      glow: {size: 10, color: '000000', opacity: 1},
+      shadow: {type:'outer', color: '7F7F7F', opacity: 0.47, angle: 45, blur: 3, offset: 3},
+      lang: 'zh-HK'
+    });
+
+    text = text.replace(/^[a-zA-Z]/, '')
+    markerHeight = parseFloat(`${template.markerCoords.h}`)
+  }
+
   slide.addText(text, {
      ...template.lyricsCoords,
+     y: `${ markerHeight + parseFloat(`${template.lyricsCoords.y}`) }%`,
      align: 'center',
      shrinkText: true,
      bold: true,
@@ -129,17 +157,28 @@ function addSlide(pres:pptxgen, text:string, template:Template) {
 
 function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:string, template:Template) {
 
+  const PAGE_BREAK='--page-break--'
+
   addSongCover(pres, name, copyright, template);
 
   let lines = lyrics.split('\n')
   .map( line => line.trim() )
+  .map( line => line.length === 0 ? PAGE_BREAK : line )
   .filter( line => line.length > 0 );
 
   let lineCount = 0;
   let text;
-  for (let i = 0; i<lines.length; i++) {
+  for (const line of lines) {
 
-    if (lines[i].match(/^[\d副]/) || lineCount == template.maxLinesPerSlide) {
+    if (line === PAGE_BREAK) {
+      if (text) {
+        addSlide(pres, text, template);
+      }
+      text = "";
+      continue;
+    }
+
+    if (line.match(/^[\d副a-zA-Z]/) || lineCount == template.maxLinesPerSlide) {
       if (text) {
         addSlide(pres, text, template);
       }
@@ -148,10 +187,10 @@ function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:s
     }
 
     if (lineCount == 0) {
-      text = lines[i];
+      text = line;
     } else {
       text += '\n';
-      text += lines[i];
+      text += line;
     }
     lineCount++;
 

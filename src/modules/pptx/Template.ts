@@ -17,6 +17,7 @@ export interface Template {
   readonly copyrightCoords:Coords
   readonly lyricsCoords:Coords
   readonly lyricsMaxLineLength:number
+  readonly markerCoords?:Coords
 }
 
 export const TEMPLATES:Template[] = [
@@ -29,7 +30,8 @@ export const TEMPLATES:Template[] = [
   songNameCoords:  { x: '20%', y: '0%', w: `60%`, h: '15%' },
   copyrightCoords: { x: '20%', y: '15%', w: '60%', h: '20%' },
   lyricsCoords:    { x: '15%', y: '0%', w: '70%', h: '50%' },
-  lyricsMaxLineLength: 14
+  markerCoords:    { x: '15%', y: '0%', w: '70%', h: '10%' },
+  lyricsMaxLineLength: 14,
 },
 
 {
