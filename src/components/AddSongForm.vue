@@ -163,7 +163,7 @@ function pageBreakPosition() {
 
   // find line start position
   let pos = lyricsText.lastIndexOf('\n', cursorPos-1)
-  pos = pos < 0 ? lyricsText.lastIndexOf('\r') : pos
+  pos = pos < 0 ? lyricsText.lastIndexOf('\r', cursorPos-1) : pos
 
   if (pos < 0) {
     // first line
@@ -234,7 +234,7 @@ function addMarker(marker:string) {
   }
 
   let pos = lyricsText.lastIndexOf('\n', cursorPos-1)
-  pos = pos < 0 ? lyricsText.lastIndexOf('\r') : pos
+  pos = pos < 0 ? lyricsText.lastIndexOf('\r', cursorPos-1) : pos
 
   if (pos < 0) {
     // first line
