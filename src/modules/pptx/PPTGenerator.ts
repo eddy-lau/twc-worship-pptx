@@ -175,6 +175,7 @@ function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:s
         addSlide(pres, text, template);
       }
       text = "";
+      lineCount = 0;
       continue;
     }
 
