@@ -43,6 +43,7 @@ export const TEMPLATES:Template[] = [
   songNameCoords:  { x: '20%', y: '0%', w: `60%`, h: '15%' },
   copyrightCoords: { x: '20%', y: '15%', w: '60%', h: '20%' },
   lyricsCoords:    { x: '15%', y: '0%', w: '70%', h: '28%' },
+  markerCoords:    { x: '15%', y: '0%', w: '70%', h: '10%' },
   lyricsMaxLineLength: 14
 },
 

@@ -121,6 +121,7 @@ function addSlide(pres:pptxgen, text:string, template:Template) {
   }
 
   let markerHeight = 0;
+  console.log(`WTF: "${text}`)
   if (text.match(/^[a-zA-Z]/) && template.markerCoords) {
 
     slide.addText(markers[text.charAt(0)], {
@@ -138,6 +139,8 @@ function addSlide(pres:pptxgen, text:string, template:Template) {
 
     text = text.replace(/^[a-zA-Z]/, '')
     markerHeight = parseFloat(`${template.markerCoords.h}`)
+  } else {
+    console.log('WTF2!!', text, text.match(/^[a-zA-Z]/), template.markerCoords)
   }
 
   slide.addText(text, {
