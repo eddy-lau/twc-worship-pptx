@@ -1,22 +1,24 @@
 <template>
   <form>
-    <div class="form-group">
-      <label for="songName">歌名</label>
+    <div class="form-section">
+      <label for="songName" class="form-label">
+        <i class="fas fa-music me-1"></i>歌名
+      </label>
       <div class="input-group">
         <input type="text" class="form-control" id="songName" v-model="name"
         placeholder="(請貼上歌名)">
-        <div class="input-group-append">
-          <button class="btn btn-outline-primary"
-            :disabled="isSearching || name === undefined || name.length == 0"
-            @click.prevent="search()">
-            <span v-if="isSearching" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            搜尋歌詞
-          </button>
-        </div>
+        <button class="btn btn-outline-primary"
+          :disabled="isSearching || name === undefined || name.length == 0"
+          @click.prevent="search()">
+          <span v-if="isSearching" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+          <i class="fas fa-search me-1"></i>搜尋歌詞
+        </button>
       </div>
     </div>
     <div class="form-group">
-      <label for="lyrics">歌詞</label>
+      <label for="lyrics" class="form-label">
+        <i class="fas fa-align-left me-1"></i>歌詞
+      </label>
       <textarea class="form-control" id="lyrics" v-model="lyrics"
         ref="lyricsElement"
         placeholder="(請貼上歌詞)"
@@ -42,14 +44,18 @@
     </div>
     </div>
     <div class="form-group">
-      <label for="copyright">版權</label>
+      <label for="copyright" class="form-label">
+        <i class="fas fa-copyright me-1"></i>版權
+      </label>
       <textarea class="form-control copyright-input" id="copyright" v-model="copyright"
         rows="5"
         placeholder="(請貼上版權內容)">
       </textarea>
     </div>
     <div class="form-group">
-      <label>背景圖片 (可選)</label>
+      <label class="form-label">
+        <i class="fas fa-image me-1"></i>背景圖片 (可選)
+      </label>
       <div class="d-flex align-items-center mb-2">
         <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#backgroundModal" @click="modalOpen = true">選擇背景</button>
         <span v-if="stockedBackground" class="ml-2 text-success">已選擇: {{ getSelectedLabel() }}</span>
@@ -431,5 +437,129 @@ defineExpose({name, lyrics, copyright, getBackgroundImageDataUrl})
   margin-top: 5px;
   font-size: 0.8em;
   color: #666;
+}
+
+/* Modern Form Styles */
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--dark-text);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.lyrics-textarea {
+  font-family: 'Courier New', monospace;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 200px;
+}
+
+.lyrics-controls {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.lyrics-controls .btn {
+  margin: 0.125rem;
+  white-space: nowrap;
+}
+
+.copyright-input {
+  font-size: 0.875rem;
+  font-family: 'Courier New', monospace;
+}
+
+/* Background selection styles */
+.background-selection {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.background-status {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Modal improvements */
+.modal-content {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  border: none;
+  padding: 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.stock-backgrounds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.stock-bg-item {
+  cursor: pointer;
+  text-align: center;
+  padding: 0.75rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  background: white;
+}
+
+.stock-bg-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary-color);
+}
+
+.stock-bg-item.selected {
+  border-color: var(--success-color);
+  background: linear-gradient(135deg, #d4edda, #c3e6cb);
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+}
+
+.stock-bg-item img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.stock-bg-item small {
+  font-weight: 500;
+  color: var(--dark-text);
+}
+
+@media (max-width: 768px) {
+  .lyrics-controls .btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .stock-backgrounds-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    max-height: 300px;
+  }
 }
 </style>

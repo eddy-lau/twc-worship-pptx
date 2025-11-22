@@ -9,6 +9,7 @@ interface Coords {
 
 export interface Template {
   readonly name:string
+  readonly description?: string
   readonly maxLinesPerSlide: number
   readonly coverTitleY: pptxgen.Coord
   readonly masterTextY: pptxgen.Coord
@@ -24,6 +25,7 @@ export interface Template {
 export const TEMPLATES:Template[] = [
 {
   name: '四行文字在上方',
+  description: '適合長歌詞，每頁顯示4行文字',
   maxLinesPerSlide: 4,
   coverTitleY:'5%',
   masterTextY: '0%',
@@ -37,6 +39,7 @@ export const TEMPLATES:Template[] = [
 
 {
   name: '兩行文字在上方',
+  description: '適合短歌詞，每頁顯示2行文字',
   maxLinesPerSlide: 2,
   coverTitleY: '5%',
   masterTextY: '0%',

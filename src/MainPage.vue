@@ -1,41 +1,83 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-    <a class="navbar-brand" href="#"><h4>詩歌PPT製作器</h4><div class="subtitle text-secondary">中華宣道會大圍堂</div></a>
-    <button class="btn btn-success float-right"
-      :disabled="downloading"
-      @click="download()">
-      <span v-if="downloading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-      完成
-    </button>
-  </nav>
-  <div class="container">
-    <div class="form-check">
-      <div v-for="(t, i) in templates">
-        <input class="form-check-input" type="radio" :value="t" v-model="template" :id="`flexCheckDefault${i}`">
-        <label class="form-check-label" :for="`flexCheckDefault${i}`">
-          {{t.name}}
-        </label>
-      </div>
-    </div>    
-
-    <div v-for="n in songCount" :key="n" class="card my-4">
-      <div class="card-header">
-        <strong>第 {{n}} 首</strong>
-      </div>
-      <div class="card-body">
-          <add-song-form ref="addSongForms" :template="template"/>
-      </div>
-      <div v-if="n == songCount" class="card-footer">
-        <button class="btn btn-secondary float-right" @click="songCount = songCount + 1">
-          新增歌曲
+  <div class="app-container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+          <img src="/ccma_twc_logo-BqU4bmAt.png" alt="Logo" class="navbar-logo me-3" style="height: 40px;">
+          <div>
+            <h4 class="mb-0">詩歌PPT製作器</h4>
+            <div class="subtitle text-secondary">中華宣道會大圍堂</div>
+          </div>
+        </a>
+        <button class="btn btn-success"
+          :disabled="downloading"
+          @click="download()">
+          <span v-if="downloading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          <i class="fas fa-download me-1"></i>完成
         </button>
+      </div>
+    </nav>
+
+    <div class="container main-content">
+      <!-- Template Selection -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card template-card">
+            <div class="card-header">
+              <h5 class="mb-0"><i class="fas fa-palette me-2"></i>選擇模板</h5>
+            </div>
+            <div class="card-body">
+              <div class="template-options">
+                <div v-for="(t, i) in templates" :key="i" class="template-option">
+                  <input class="form-check-input" type="radio" :value="t" v-model="template" :id="`template${i}`">
+                  <label class="form-check-label" :for="`template${i}`">
+                    <strong>{{t.name}}</strong>
+                    <small class="text-muted d-block">{{t.description || '詩歌PPT模板'}}</small>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Songs -->
+      <div v-for="n in songCount" :key="n" class="song-card">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-music me-2"></i>第 {{n}} 首詩歌</h5>
+            <span v-if="n > 1" class="badge bg-secondary">{{n}}</span>
+          </div>
+          <div class="card-body">
+            <add-song-form ref="addSongForms" :template="template"/>
+          </div>
+          <div v-if="n === songCount" class="card-footer">
+            <button class="btn btn-outline-primary" @click="songCount = songCount + 1">
+              <i class="fas fa-plus me-1"></i>新增歌曲
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PWA Install Prompt -->
+      <div id="install-prompt" class="install-prompt">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <strong>安裝應用程式</strong>
+            <p class="mb-0 text-muted small">安裝到裝置以獲得更好的體驗</p>
+          </div>
+          <div>
+            <button class="btn btn-primary btn-sm me-2" id="install-btn">安裝</button>
+            <button class="btn btn-outline-secondary btn-sm" id="dismiss-btn">稍後</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import AddSongForm from './components/AddSongForm.vue';
 import { PPTGenerator, TEMPLATES } from './modules/pptx';
 import downloadjs from 'downloadjs';
@@ -46,9 +88,60 @@ const template = ref(TEMPLATES[0])
 const templates = TEMPLATES
 const addSongForms = ref<InstanceType<typeof AddSongForm>[]>()
 
+// PWA Install Prompt
+let deferredPrompt: any = null;
+
+onMounted(() => {
+  // Listen for the beforeinstallprompt event
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    showInstallPrompt();
+  });
+
+  // Listen for successful installation
+  window.addEventListener('appinstalled', () => {
+    hideInstallPrompt();
+    deferredPrompt = null;
+  });
+
+  // Setup install button
+  const installBtn = document.getElementById('install-btn');
+  const dismissBtn = document.getElementById('dismiss-btn');
+
+  if (installBtn) {
+    installBtn.addEventListener('click', installPWA);
+  }
+
+  if (dismissBtn) {
+    dismissBtn.addEventListener('click', hideInstallPrompt);
+  }
+});
+
+const showInstallPrompt = () => {
+  const prompt = document.getElementById('install-prompt');
+  if (prompt) {
+    prompt.classList.add('show');
+  }
+};
+
+const hideInstallPrompt = () => {
+  const prompt = document.getElementById('install-prompt');
+  if (prompt) {
+    prompt.classList.remove('show');
+  }
+};
+
+const installPWA = async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    hideInstallPrompt();
+  }
+};
 
 const download = async () => {
-
   if (!addSongForms.value) {
     return
   }
@@ -77,15 +170,106 @@ const download = async () => {
   let cloned = new Blob([blob as BlobPart], {type: mimetype});
   downloadjs(cloned, '詩歌.pptx');
   downloading.value = false;
-
 }
 </script>
 
 <style scoped>
-.container {
-  margin-top: 100px;
+.app-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
-.subtitle {
-  font-size: 16px;
+
+.main-content {
+  margin-top: 120px;
+  padding-bottom: 2rem;
+}
+
+.navbar-logo {
+  border-radius: 8px;
+}
+
+.template-card {
+  background: white;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+.template-options {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.template-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  flex: 1;
+  min-width: 200px;
+}
+
+.template-option:hover {
+  border-color: var(--primary-color);
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+.song-card {
+  margin-bottom: 2rem;
+}
+
+.song-card .card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  transition: all 0.3s ease;
+}
+
+.song-card .card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.install-prompt {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: none;
+  backdrop-filter: blur(10px);
+}
+
+.install-prompt.show {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-top: 140px;
+    padding: 0 1rem;
+  }
+
+  .template-options {
+    flex-direction: column;
+  }
+
+  .template-option {
+    min-width: auto;
+  }
+
+  .install-prompt {
+    left: 10px;
+    right: 10px;
+  }
 }
 </style>
