@@ -74,7 +74,7 @@ const download = async () => {
   downloading.value = true;
   const blob = await pptx.saveBlob()
   let mimetype = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
-  let cloned = new Blob([blob], {type: mimetype});
+  let cloned = new Blob([blob as BlobPart], {type: mimetype});
   downloadjs(cloned, '詩歌.pptx');
   downloading.value = false;
 
