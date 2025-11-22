@@ -49,8 +49,50 @@
       </textarea>
     </div>
     <div class="form-group">
-      <label for="backgroundImage">背景圖片 (可選)</label>
-      <input type="file" class="form-control-file" id="backgroundImage" ref="backgroundImageInput" accept="image/*">
+      <label>背景圖片 (可選)</label>
+      <div class="d-flex align-items-center mb-2">
+        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#backgroundModal">選擇背景</button>
+        <span v-if="stockedBackground" class="ml-2 text-success">已選擇: {{ getSelectedLabel() }}</span>
+        <span v-else-if="backgroundImageInput && backgroundImageInput.files && backgroundImageInput.files[0]" class="ml-2 text-success">已上傳: {{ backgroundImageInput.files[0].name }}</span>
+        <button v-if="stockedBackground || (backgroundImageInput && backgroundImageInput.files && backgroundImageInput.files[0])" type="button" class="btn btn-outline-secondary btn-sm ml-2" @click="clearBackground()">清除</button>
+      </div>
+    </div>
+
+    <!-- Background Selection Modal -->
+    <div class="modal fade" id="backgroundModal" tabindex="-1" role="dialog" aria-labelledby="backgroundModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="backgroundModalLabel">選擇背景圖片</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <button type="button" class="btn btn-outline-secondary" @click="selectBackground('')">無背景 (預設)</button>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">上傳自訂圖片：</label>
+              <input type="file" class="form-control-file" id="backgroundImage" ref="backgroundImageInput" accept="image/*" @change="onFileChange">
+            </div>
+            <hr>
+            <h6>現成背景：</h6>
+            <div class="stock-backgrounds-grid">
+              <div v-for="bg in stockBackgrounds" :key="bg.value" 
+                   class="stock-bg-item" 
+                   :class="{ selected: stockedBackground === bg.value }"
+                   @click="selectBackground(bg.value)">
+                <img :src="`/stock-backgrounds/${bg.value}`" :alt="bg.label" class="img-thumbnail">
+                <small class="text-center d-block">{{ bg.label }}</small>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+          </div>
+        </div>
+      </div>
     </div>
   </form>
 </template>
@@ -71,6 +113,29 @@ const lyricsElement = ref<HTMLTextAreaElement|null>(null)
 const disablePageBreakButton = ref(false)
 const disableMarkerButton = ref(false)
 const backgroundImageInput = ref<HTMLInputElement>()
+const stockedBackground = ref('')
+
+const stockBackgrounds = [
+  { value: '163-1630260_footprints-in-the-sand-wallpaper-footprints-in-the.jpg', label: 'Footprints' },
+  { value: '41dNG1AgmIL._SX425_.jpg', label: 'Abstract' },
+  { value: '640.jpg', label: '640 BG' },
+  { value: '9c58d46316e99cbe14be3ca4d74ebdae.jpg', label: 'Nature' },
+  { value: 'GetMedia.jpg', label: 'GetMedia' },
+  { value: 'Grok Image 2025-04-12 at 7.38.48 PM.png', label: 'Grok' },
+  { value: 'Picture1.jpg', label: 'Pic 1' },
+  { value: 'Picture10.jpg', label: 'Pic 10' },
+  { value: 'Picture11.jpg', label: 'Pic 11' },
+  { value: 'Picture4.jpg', label: 'Pic 4' },
+  { value: 'Picture6.jpg', label: 'Pic 6' },
+  { value: 'Picture7.jpg', label: 'Pic 7' },
+  { value: 'Picture8.jpg', label: 'Pic 8' },
+  { value: 'Picture9.jpg', label: 'Pic 9' },
+  { value: 'animated01.gif', label: 'Animated 1' },
+  { value: 'animated02.gif', label: 'Animated 2' },
+  { value: 'hd-road-editing-background-11560093640sgzwr0aeo0.jpg', label: 'HD Road' },
+  { value: 'itl.cat_wallpapersafari_248797.png', label: 'Cat' },
+  { value: 'worship2.jpg', label: 'Worship 2' }
+]
 
 
 const wrap = (line:string) => {
@@ -252,6 +317,9 @@ function addMarker(marker:string) {
 }
 
 const getBackgroundImageDataUrl = async (): Promise<string | undefined> => {
+  if (stockedBackground.value) {
+    return `/stock-backgrounds/${stockedBackground.value}`;
+  }
   if (backgroundImageInput.value && backgroundImageInput.value.files && backgroundImageInput.value.files[0]) {
     const file = backgroundImageInput.value.files[0];
     return new Promise<string>((resolve, reject) => {
@@ -290,10 +358,75 @@ const getBackgroundImageDataUrl = async (): Promise<string | undefined> => {
   return undefined;
 }
 
-setInterval( ()=> {
-  disablePageBreakButton.value = pageBreakPosition() < 0
-  disableMarkerButton.value = !lyricsElement.value || !lyricsElement.value.matches(':focus')
-}, 500)
+const getSelectedLabel = () => {
+  if (!stockedBackground.value) return '';
+  const bg = stockBackgrounds.find(b => b.value === stockedBackground.value);
+  return bg ? bg.label : stockedBackground.value;
+}
+
+const selectBackground = (value: string) => {
+  stockedBackground.value = value;
+  // Clear uploaded file if selecting stock
+  if (backgroundImageInput.value) {
+    backgroundImageInput.value.value = '';
+  }
+}
+
+const clearBackground = () => {
+  stockedBackground.value = '';
+  if (backgroundImageInput.value) {
+    backgroundImageInput.value.value = '';
+  }
+}
+
+const onFileChange = () => {
+  // Clear stock selection when uploading file
+  stockedBackground.value = '';
+}
 
 defineExpose({name, lyrics, copyright, getBackgroundImageDataUrl})
 </script>
+
+<style scoped>
+.stock-backgrounds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.stock-bg-item {
+  cursor: pointer;
+  text-align: center;
+  padding: 5px;
+  border-radius: 5px;
+  transition: border-color 0.2s;
+}
+
+.stock-bg-item:hover {
+  border: 2px solid #007bff;
+}
+
+.stock-bg-item.selected {
+  border: 2px solid #28a745;
+  background-color: #f8f9fa;
+}
+
+.stock-bg-item img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 3px;
+}
+
+.stock-bg-item small {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.8em;
+  color: #666;
+}
+</style>
