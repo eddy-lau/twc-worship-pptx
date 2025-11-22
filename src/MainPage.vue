@@ -98,16 +98,19 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import AddSongForm from './components/AddSongForm.vue';
-import { PPTGenerator, TEMPLATES } from './modules/pptx';
-import downloadjs from 'downloadjs';
+import AddSongForm from './components/AddSongForm.vue'
+import { PPTGenerator, TEMPLATES } from './modules/pptx'
+import packageJson from '../package.json'
+import downloadjs from 'downloadjs'
+
+// ... existing code ...
 
 const songCount = ref(1)
 const downloading = ref(false)
 const template = ref(TEMPLATES[0])
 const templates = TEMPLATES
 const addSongForms = ref<InstanceType<typeof AddSongForm>[]>()
-const version = '3.0.0'
+const version = packageJson.version
 
 // PWA Install Prompt
 let deferredPrompt: any = null;
