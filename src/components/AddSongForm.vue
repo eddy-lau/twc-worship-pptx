@@ -83,7 +83,7 @@
                    class="stock-bg-item" 
                    :class="{ selected: stockedBackground === bg.value }"
                    @click="selectBackground(bg.value)">
-                <img :src="`/stock-backgrounds/${bg.value}`" :alt="bg.label" class="img-thumbnail">
+                                <img :src="`${baseUrl}stock-backgrounds/${bg.value}`" :alt="bg.label" class="img-thumbnail">
                 <small class="text-center d-block">{{ bg.label }}</small>
               </div>
             </div>
@@ -99,7 +99,7 @@
 
 <script setup lang="ts">
 
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import firebase from 'firebase/app';
 import 'firebase/functions';
 import { Template } from '../modules/pptx/Template';
@@ -318,7 +318,7 @@ function addMarker(marker:string) {
 
 const getBackgroundImageDataUrl = async (): Promise<string | undefined> => {
   if (stockedBackground.value) {
-    return `/stock-backgrounds/${stockedBackground.value}`;
+    return `${import.meta.env.BASE_URL}stock-backgrounds/${stockedBackground.value}`;
   }
   if (backgroundImageInput.value && backgroundImageInput.value.files && backgroundImageInput.value.files[0]) {
     const file = backgroundImageInput.value.files[0];
@@ -383,6 +383,8 @@ const onFileChange = () => {
   // Clear stock selection when uploading file
   stockedBackground.value = '';
 }
+
+const baseUrl = computed(() => import.meta.env.BASE_URL)
 
 defineExpose({name, lyrics, copyright, getBackgroundImageDataUrl})
 </script>
