@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "bootstrap": "^4.5.3",
+    "bootstrap": "^5.3.3",
     "core-js": "^3.6.5",
     "downloadjs": "^1.4.7",
     "firebase": "^8.2.0",
