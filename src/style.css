@@ -35,19 +35,37 @@ body {
   color: white !important;
   font-weight: 600;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-direction: row;
+  align-items: center;
+  padding: 0;
 }
 
-.navbar-brand h4 {
-  margin: 0;
+.navbar-logo {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+
+.title-section {
+  display: flex;
+  flex-direction: column;
+  margin-left: 1rem;
+}
+
+.title-main {
+  color: white !important;
   font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
 }
 
 .navbar .subtitle {
+  color: rgba(255, 255, 255, 0.9) !important;
   font-size: 0.875rem;
-  opacity: 0.9;
+  font-weight: 400;
   margin-top: 2px;
+  opacity: 0.95;
 }
 
 .btn-success {

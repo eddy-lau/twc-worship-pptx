@@ -4,9 +4,9 @@
       <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center" href="#">
           <img src="/ccma_twc_logo-BqU4bmAt.png" alt="Logo" class="navbar-logo me-3" style="height: 40px;">
-          <div>
-            <h4 class="mb-0">詩歌PPT製作器</h4>
-            <div class="subtitle text-secondary">中華宣道會大圍堂</div>
+          <div class="title-section">
+            <h4 class="mb-0 title-main">詩歌PPT製作器</h4>
+            <div class="subtitle">中華宣道會大圍堂</div>
           </div>
         </a>
         <button class="btn btn-success"
@@ -73,6 +73,26 @@
         </div>
       </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="footer-info">
+            <small class="text-muted">
+              <i class="fas fa-code me-1"></i>
+              詩歌PPT製作器 v{{ version }}
+            </small>
+          </div>
+          <div class="footer-links">
+            <small class="text-muted">
+              <i class="fas fa-heart me-1"></i>
+              中華宣道會大圍堂
+            </small>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -87,6 +107,7 @@ const downloading = ref(false)
 const template = ref(TEMPLATES[0])
 const templates = TEMPLATES
 const addSongForms = ref<InstanceType<typeof AddSongForm>[]>()
+const version = '3.0.0'
 
 // PWA Install Prompt
 let deferredPrompt: any = null;
@@ -270,6 +291,34 @@ const download = async () => {
   .install-prompt {
     left: 10px;
     right: 10px;
+  }
+}
+
+/* Footer Styles */
+.app-footer {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 0;
+  margin-top: 3rem;
+  position: relative;
+}
+
+.footer-info,
+.footer-links {
+  font-size: 0.875rem;
+}
+
+.footer-info i,
+.footer-links i {
+  color: var(--primary-color);
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .app-footer .d-flex {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
   }
 }
 </style>
