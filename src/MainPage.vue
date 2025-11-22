@@ -198,11 +198,15 @@ const download = async () => {
 .app-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  display: flex;
+  flex-direction: column;
 }
 
 .main-content {
-  margin-top: 120px;
+  margin-top: 74px;
   padding-bottom: 2rem;
+  flex: 1;
+  padding-top: 20px;
 }
 
 .navbar-logo {
@@ -290,7 +294,7 @@ const download = async () => {
 
 @media (max-width: 768px) {
   .main-content {
-    margin-top: 140px;
+    margin-top: 72px;
     padding: 0 1rem;
   }
 
