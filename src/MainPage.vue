@@ -46,19 +46,22 @@ const template = ref(TEMPLATES[0])
 const templates = TEMPLATES
 const addSongForms = ref<InstanceType<typeof AddSongForm>[]>()
 
+
 const download = async () => {
 
   if (!addSongForms.value) {
     return
   }
 
-  const songs = addSongForms.value.map( f => {
+  const songs = await Promise.all(addSongForms.value.map(async f => {
+    const backgroundImage = await f.getBackgroundImageDataUrl();
     return {
       name: f.name,
       copyright: f.copyright,
-      lyrics: f.lyrics
+      lyrics: f.lyrics,
+      backgroundImage
     }
-  }).filter( s => s.name && s.lyrics )
+  })).then(songs => songs.filter(s => s.name && s.lyrics))
 
   if (songs.length == 0) {
     alert('請加入最少一首詩歌。');

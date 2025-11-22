@@ -18,6 +18,7 @@ export interface Template {
   readonly lyricsCoords:Coords
   readonly lyricsMaxLineLength:number
   readonly markerCoords?:Coords
+  readonly backgroundImage?:string
 }
 
 export const TEMPLATES:Template[] = [

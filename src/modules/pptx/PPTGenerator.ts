@@ -6,7 +6,7 @@ import { Template } from "./Template";
 
 function addPresentationCover(pres:pptxgen, template:Template) {
 
-  let slide = newSlideTemplate(pres);
+  let slide = newSlideTemplate(pres, 'MASTER');
 
   let y:pptxgen.Coord = template.coverTitleY
 
@@ -26,7 +26,7 @@ function addPresentationCover(pres:pptxgen, template:Template) {
 
 }
 
-function createMasterSlide(pres:pptxgen, title:string, template:Template) {
+function createMasterSlide(pres:pptxgen, title:string, template:Template, backgroundImage?:string) {
 
 //  let background = { fill: '0000FF' };
 
@@ -40,11 +40,16 @@ function createMasterSlide(pres:pptxgen, title:string, template:Template) {
   };
   let textBackgroundTransparency = template.lyricsBackgroundTransparency
 
+  let backgroundObj: any = {};
+  if (backgroundImage) {
+    backgroundObj = { path: backgroundImage };
+  } else {
+    backgroundObj = { fill: '0000FF' };
+  }
+
   pres.defineSlideMaster({
     title: title,
-    background:{
-      fill: '0000FF'
-    },
+    background: backgroundObj,
     objects: [
       {image:{
         path:CCMALogo,
@@ -69,15 +74,15 @@ function createMasterSlide(pres:pptxgen, title:string, template:Template) {
 
 }
 
-function newSlideTemplate(pres:pptxgen) {
+function newSlideTemplate(pres:pptxgen, masterName: string) {
 
-  let slide = pres.addSlide({masterName: 'MASTER'});
+  let slide = pres.addSlide({masterName: masterName});
   return slide;
 }
 
-function addSongCover(pres:pptxgen, name:string, copyright:string|undefined, template:Template) {
+function addSongCover(pres:pptxgen, name:string, copyright:string|undefined, template:Template, masterName:string) {
 
-  let slide = newSlideTemplate(pres);
+  let slide = newSlideTemplate(pres, masterName);
 
   slide.addText(`【${name}】`, {
      ...template.songNameCoords,
@@ -109,9 +114,9 @@ function addSongCover(pres:pptxgen, name:string, copyright:string|undefined, tem
 
 }
 
-function addSlide(pres:pptxgen, text:string, template:Template) {
+function addSlide(pres:pptxgen, text:string, template:Template, masterName:string) {
 
-  let slide = newSlideTemplate(pres);
+  let slide = newSlideTemplate(pres, masterName);
 
   const markers:{[key:string]:string} = {
     'b': 'Bridge',
@@ -158,11 +163,11 @@ function addSlide(pres:pptxgen, text:string, template:Template) {
   });
 }
 
-function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:string, template:Template) {
+function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:string, template:Template, masterName:string) {
 
   const PAGE_BREAK='--page-break--'
 
-  addSongCover(pres, name, copyright, template);
+  addSongCover(pres, name, copyright, template, masterName);
 
   let lines = lyrics.split('\n')
   .map( line => line.trim() )
@@ -175,7 +180,7 @@ function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:s
 
     if (line === PAGE_BREAK) {
       if (text) {
-        addSlide(pres, text, template);
+        addSlide(pres, text, template, masterName);
       }
       text = "";
       lineCount = 0;
@@ -184,7 +189,7 @@ function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:s
 
     if (line.match(/^[\d副a-zA-Z]/) || lineCount == template.maxLinesPerSlide) {
       if (text) {
-        addSlide(pres, text, template);
+        addSlide(pres, text, template, masterName);
       }
       text = "";
       lineCount = 0;
@@ -201,7 +206,7 @@ function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:s
   }
 
   if (text) {
-    addSlide(pres, text, template);
+    addSlide(pres, text, template, masterName);
   }
 
 }
@@ -210,6 +215,7 @@ export class PPTGenerator {
 
   template:Template
   pres:pptxgen
+  masters: Map<string, string> = new Map();
 
   constructor(template:Template) {
     this.template = template
@@ -218,12 +224,20 @@ export class PPTGenerator {
     this.pres.layout = 'LAYOUT_16x9';
 
     createMasterSlide(this.pres, 'MASTER', template);
-    addPresentationCover(this.pres, template);
-  
-  }
+    addPresentationCover(this.pres, template);  }
 
-  addSong(song:{name:string, copyright:string|undefined, lyrics:string}) {
-    addSong(this.pres, song.name, song.copyright, song.lyrics, this.template)
+  addSong(song:{name:string, copyright:string|undefined, lyrics:string, backgroundImage?:string}) {
+    let masterName = 'MASTER';
+    if (song.backgroundImage) {
+      if (!this.masters.has(song.backgroundImage)) {
+        masterName = `MASTER_${this.masters.size}`;
+        this.masters.set(song.backgroundImage, masterName);
+        createMasterSlide(this.pres, masterName, this.template, song.backgroundImage);
+      } else {
+        masterName = this.masters.get(song.backgroundImage)!;
+      }
+    }
+    addSong(this.pres, song.name, song.copyright, song.lyrics, this.template, masterName)
   }
 
   async saveBlob():Promise<string | ArrayBuffer | Blob | Uint8Array> {

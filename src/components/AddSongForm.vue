@@ -48,6 +48,10 @@
         placeholder="(請貼上版權內容)">
       </textarea>
     </div>
+    <div class="form-group">
+      <label for="backgroundImage">背景圖片 (可選)</label>
+      <input type="file" class="form-control-file" id="backgroundImage" ref="backgroundImageInput" accept="image/*">
+    </div>
   </form>
 </template>
 
@@ -66,6 +70,7 @@ const isSearching = ref(false)
 const lyricsElement = ref<HTMLTextAreaElement|null>(null)
 const disablePageBreakButton = ref(false)
 const disableMarkerButton = ref(false)
+const backgroundImageInput = ref<HTMLInputElement>()
 
 
 const wrap = (line:string) => {
@@ -246,10 +251,49 @@ function addMarker(marker:string) {
 
 }
 
+const getBackgroundImageDataUrl = async (): Promise<string | undefined> => {
+  if (backgroundImageInput.value && backgroundImageInput.value.files && backgroundImageInput.value.files[0]) {
+    const file = backgroundImageInput.value.files[0];
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Canvas not supported'));
+            return;
+          }
+          // Resize to fit within 1920x1080 while maintaining aspect ratio
+          const maxWidth = 1920;
+          const maxHeight = 1080;
+          let { width, height } = img;
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            width *= ratio;
+            height *= ratio;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8); // Compress to JPEG with 80% quality
+          resolve(dataUrl);
+        };
+        img.onerror = () => reject(new Error('Failed to load image'));
+        img.src = reader.result as string;
+      };
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(file);
+    });
+  }
+  return undefined;
+}
+
 setInterval( ()=> {
   disablePageBreakButton.value = pageBreakPosition() < 0
   disableMarkerButton.value = !lyricsElement.value || !lyricsElement.value.matches(':focus')
 }, 500)
 
-defineExpose({name, lyrics, copyright})
+defineExpose({name, lyrics, copyright, getBackgroundImageDataUrl})
 </script>
