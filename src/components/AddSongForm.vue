@@ -5,12 +5,11 @@
         <i class="fas fa-music me-1"></i>歌名
       </label>
       <div class="input-group">
-        <input type="text" class="form-control" id="songName" v-model="name"
-        placeholder="(請貼上歌名)">
-        <button class="btn btn-outline-primary"
-          :disabled="isSearching || name === undefined || name.length == 0"
+        <input type="text" class="form-control" id="songName" v-model="name" placeholder="(請貼上歌名)">
+        <button class="btn btn-outline-primary" :disabled="isSearching || name === undefined || name.length == 0"
           @click.prevent="search()">
-          <span v-if="isSearching" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+          <span v-if="isSearching" class="spinner-border spinner-border-sm me-1" role="status"
+            aria-hidden="true"></span>
           <i class="fas fa-search me-1"></i>搜尋歌詞
         </button>
       </div>
@@ -19,36 +18,31 @@
       <label for="lyrics" class="form-label">
         <i class="fas fa-align-left me-1"></i>歌詞
       </label>
-      <textarea class="form-control" id="lyrics" v-model="lyrics"
-        ref="lyricsElement"
-        placeholder="(請貼上歌詞)"
+      <textarea class="form-control" id="lyrics" v-model="lyrics" ref="lyricsElement" placeholder="(請貼上歌詞)"
         rows="10"></textarea>
 
       <div class="form-group my-1">
-        <button type="button" class="btn btn-outline-success btn-sm my-1 mx-1"
-        @click="addMarker('1')" :disabled="disableMarkerButton">第1節</button>        
-        <button type="button" class="btn btn-outline-success btn-sm my-1 mx-1"
-        @click="addMarker('2')" :disabled="disableMarkerButton">第2節</button>
-        <button type="button" class="btn btn-outline-success btn-sm my-1 mx-1"
-        @click="addMarker('3')" :disabled="disableMarkerButton">第3節</button>
-        <button type="button" class="btn btn-outline-success btn-sm my-1 mx-1"
-        @click="addMarker('C')" :disabled="disableMarkerButton">副歌</button>
-        <button type="button" class="btn btn-outline-success btn-sm my-1 mx-1"
-        @click="addMarker('B')" :disabled="disableMarkerButton">Bridge</button>
-        <button type="button" class="btn btn-outline-success btn-sm my-1 mx-1"
-        @click="addPageBreak()" :disabled="disablePageBreakButton">新頁</button>
-        <button type="button" class="btn btn-outline-primary btn-sm my-1 mx-1"
-        @click="replaceChar()">你 > 祢</button>
-        <button type="button" class="btn btn-outline-primary btn-sm my-1 mx-1"
-        @click="formatText()">整理歌詞</button>
-    </div>
+        <button type="button" class="btn btn-outline-success btn-sm my-1 mx-1" @click="addMarker('1')"
+          :disabled="disableMarkerButton">第1節</button>
+        <button type="button" class="btn btn-outline-success btn-sm my-1 mx-1" @click="addMarker('2')"
+          :disabled="disableMarkerButton">第2節</button>
+        <button type="button" class="btn btn-outline-success btn-sm my-1 mx-1" @click="addMarker('3')"
+          :disabled="disableMarkerButton">第3節</button>
+        <button type="button" class="btn btn-outline-success btn-sm my-1 mx-1" @click="addMarker('C')"
+          :disabled="disableMarkerButton">副歌</button>
+        <button type="button" class="btn btn-outline-success btn-sm my-1 mx-1" @click="addMarker('B')"
+          :disabled="disableMarkerButton">Bridge</button>
+        <button type="button" class="btn btn-outline-success btn-sm my-1 mx-1" @click="addPageBreak()"
+          :disabled="disablePageBreakButton">新頁</button>
+        <button type="button" class="btn btn-outline-primary btn-sm my-1 mx-1" @click="replaceChar()">你 > 祢</button>
+        <button type="button" class="btn btn-outline-primary btn-sm my-1 mx-1" @click="formatText()">整理歌詞</button>
+      </div>
     </div>
     <div class="form-group">
       <label for="copyright" class="form-label">
         <i class="fas fa-copyright me-1"></i>版權
       </label>
-      <textarea class="form-control copyright-input" id="copyright" v-model="copyright"
-        rows="5"
+      <textarea class="form-control copyright-input" id="copyright" v-model="copyright" rows="5"
         placeholder="(請貼上版權內容)">
       </textarea>
     </div>
@@ -63,7 +57,8 @@
 
         <div v-if="selectedBackground" class="selected-background">
           <div class="selected-preview">
-            <img v-if="selectedBackground.type === 'stock'" :src="`${baseUrl}stock-backgrounds/${selectedBackground.value}`" alt="Selected background">
+            <img v-if="selectedBackground.type === 'stock'"
+              :src="`${baseUrl}stock-backgrounds/${selectedBackground.value}`" alt="Selected background">
             <div v-else class="custom-image-placeholder">
               <i class="fas fa-image"></i>
               <span>{{ selectedBackground.name }}</span>
@@ -77,6 +72,13 @@
           </div>
         </div>
       </div>
+    </div>
+
+
+    <div class="form-group mt-4">
+      <button type="button" class="btn btn-info text-white w-100" @click="openPreview">
+        <i class="fas fa-eye me-2"></i>預覽 PPT
+      </button>
     </div>
 
     <!-- Background Modal Teleported to Body -->
@@ -105,17 +107,14 @@
                 <span>上傳圖片</span>
               </button>
               <input type="file" ref="fileInput" accept="image/*" @change="handleFileUpload" style="display: none;">
-              <input type="file" ref="backgroundImageInput" accept="image/*" @change="handleFileUpload" style="display: none;">
+              <input type="file" ref="backgroundImageInput" accept="image/*" @change="handleFileUpload"
+                style="display: none;">
             </div>
 
             <!-- Categories -->
             <div class="categories">
-              <button
-                v-for="category in categories"
-                :key="category.id"
-                class="category-btn"
-                :class="{ active: activeCategory === category.id }"
-                @click="setActiveCategory(category.id)">
+              <button v-for="category in categories" :key="category.id" class="category-btn"
+                :class="{ active: activeCategory === category.id }" @click="setActiveCategory(category.id)">
                 <i :class="category.icon"></i>
                 {{ category.name }}
               </button>
@@ -128,12 +127,8 @@
                 <p>此分類沒有背景圖片</p>
               </div>
               <div v-else class="backgrounds-grid">
-                <div
-                  v-for="bg in filteredBackgrounds"
-                  :key="bg.value"
-                  class="background-card"
-                  :class="{ selected: isSelected(bg) }"
-                  @click="selectStockBackground(bg)">
+                <div v-for="bg in filteredBackgrounds" :key="bg.value" class="background-card"
+                  :class="{ selected: isSelected(bg) }" @click="selectStockBackground(bg)">
                   <div class="background-preview">
                     <img :src="`${baseUrl}stock-backgrounds/${bg.value}`" :alt="bg.label" @error="handleImageError">
                     <div class="background-overlay">
@@ -156,6 +151,10 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- Preview Modal -->
+    <PreviewModal v-if="showPreviewModal" :show="showPreviewModal" :name="name" :copyright="copyright" :lyrics="lyrics"
+      :background-image="previewBackgroundImage" :template="template" @close="showPreviewModal = false" />
   </form>
 </template>
 
@@ -165,18 +164,21 @@ import { ref, computed } from 'vue'
 import firebase from 'firebase/app';
 import 'firebase/functions';
 import { Template } from '../modules/pptx/Template';
+import PreviewModal from './PreviewModal.vue';
 
-const props = defineProps<{template:Template}>()
+const props = defineProps<{ template: Template }>()
 const name = ref('')
 const copyright = ref('')
 const lyrics = ref('')
 const isSearching = ref(false)
-const lyricsElement = ref<HTMLTextAreaElement|null>(null)
+const lyricsElement = ref<HTMLTextAreaElement | null>(null)
 const disablePageBreakButton = ref(false)
 const disableMarkerButton = ref(false)
 const backgroundImageInput = ref<HTMLInputElement>()
 const stockedBackground = ref('')
 const showBackgroundModal = ref(false)
+const showPreviewModal = ref(false)
+const previewBackgroundImage = ref<string>('')
 const activeCategory = ref('all')
 const fileInput = ref<HTMLInputElement>()
 
@@ -232,7 +234,7 @@ const selectedBackground = computed(() => {
 })
 
 
-const wrap = (line:string) => {
+const wrap = (line: string) => {
   if (!props.template) {
     return ''
   }
@@ -247,7 +249,7 @@ const wrap = (line:string) => {
     line = line.substring(0, lastChar.index);
   }
 
-  let result:string[] = [];
+  let result: string[] = [];
 
   let firstPart = '';
   let secondPart = '';
@@ -277,15 +279,15 @@ const wrap = (line:string) => {
 const formatText = () => {
   let lines = lyrics.value.split('\n');
   lines = lines
-    .map( l => l.trim() )
-    .reduce( (r, l) => {
-      if (l.length === 0 && r[r.length-1].length === 0) {
+    .map(l => l.trim())
+    .reduce((r, l) => {
+      if (l.length === 0 && r[r.length - 1].length === 0) {
         return r
-      } 
+      }
       r.push(l)
       return r
     }, [] as string[])
-    .reduce( (r,l) => {
+    .reduce((r, l) => {
       return r.concat(wrap(l))
     }, [] as string[])
   lyrics.value = lines.join('\n');
@@ -298,14 +300,14 @@ const replaceChar = () => {
 const search = () => {
   isSearching.value = true;
   const searchLyrics = firebase.functions().httpsCallable('searchLyrics');
-  searchLyrics(name.value).then( result => {
+  searchLyrics(name.value).then(result => {
     if (result.data && result.data.lyrics) {
       lyrics.value = result.data.lyrics;
       copyright.value = result.data.copyright;
       formatText();
     }
     isSearching.value = false;
-  }).catch( err => {
+  }).catch(err => {
     alert(err.toString());
     isSearching.value = false;
   })
@@ -326,8 +328,8 @@ function pageBreakPosition() {
   }
 
   // find line start position
-  let pos = lyricsText.lastIndexOf('\n', cursorPos-1)
-  pos = pos < 0 ? lyricsText.lastIndexOf('\r', cursorPos-1) : pos
+  let pos = lyricsText.lastIndexOf('\n', cursorPos - 1)
+  pos = pos < 0 ? lyricsText.lastIndexOf('\r', cursorPos - 1) : pos
 
   if (pos < 0) {
     // first line
@@ -365,7 +367,7 @@ function pageBreakPosition() {
 function addPageBreak() {
 
   const pos = pageBreakPosition()
-  if( pos < 0) {
+  if (pos < 0) {
     return
   }
 
@@ -373,7 +375,7 @@ function addPageBreak() {
   lyrics.value = lyricsText.slice(0, pos) + `\n${lyricsText.slice(pos)}`
 }
 
-function mark(marker:string, text:string) {
+function mark(marker: string, text: string) {
 
   const regex = /^[\da-zA-Z]\s/
   if (text.match(regex)) {
@@ -383,7 +385,7 @@ function mark(marker:string, text:string) {
   return `${marker} ${text}`
 }
 
-function addMarker(marker:string) {
+function addMarker(marker: string) {
 
   if (!lyricsElement.value) {
     return
@@ -397,8 +399,8 @@ function addMarker(marker:string) {
     return
   }
 
-  let pos = lyricsText.lastIndexOf('\n', cursorPos-1)
-  pos = pos < 0 ? lyricsText.lastIndexOf('\r', cursorPos-1) : pos
+  let pos = lyricsText.lastIndexOf('\n', cursorPos - 1)
+  pos = pos < 0 ? lyricsText.lastIndexOf('\r', cursorPos - 1) : pos
 
   if (pos < 0) {
     // first line
@@ -406,7 +408,7 @@ function addMarker(marker:string) {
     return
   }
 
-  lyrics.value = lyricsText.slice(0, pos+1) + mark(marker, lyricsText.slice(pos+1))
+  lyrics.value = lyricsText.slice(0, pos + 1) + mark(marker, lyricsText.slice(pos + 1))
 
 }
 
@@ -517,9 +519,21 @@ const confirmSelection = () => {
   showBackgroundModal.value = false;
 }
 
+const openPreview = async () => {
+  try {
+    const bg = await getBackgroundImageDataUrl()
+    previewBackgroundImage.value = bg || ''
+    showPreviewModal.value = true
+  } catch (e) {
+    console.error('Failed to load background for preview', e)
+    previewBackgroundImage.value = ''
+    showPreviewModal.value = true
+  }
+}
+
 const baseUrl = ''
 
-defineExpose({name, lyrics, copyright, getBackgroundImageDataUrl})
+defineExpose({ name, lyrics, copyright, getBackgroundImageDataUrl })
 </script>
 
 <style scoped>
