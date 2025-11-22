@@ -171,8 +171,8 @@ const logoTWCHeight = computed(() => {
 
 const getStyle = (coords: any, fontSizePt: number = 36): CSSProperties => {
   if (!coords) return {}
-  // Convert points to pixels: 1pt = 1.333px at 96 DPI, then scale
-  const fontSizePx = fontSizePt * 1.333 * scaleFactor.value
+  // Convert points to pixels with adjusted multiplier for better preview accuracy
+  const fontSizePx = fontSizePt * 1.2 * scaleFactor.value
   return {
     position: 'absolute',
     left: coords.x,
