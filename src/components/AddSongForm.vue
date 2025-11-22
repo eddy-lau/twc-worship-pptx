@@ -57,7 +57,7 @@
         <i class="fas fa-image me-1"></i>背景圖片 (可選)
       </label>
       <div class="d-flex align-items-center mb-2">
-        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#backgroundModal" @click="modalOpen = true">選擇背景</button>
+        <button type="button" class="btn btn-outline-primary" @click="openBackgroundModal">選擇背景</button>
         <span v-if="stockedBackground" class="ml-2 text-success">已選擇: {{ getSelectedLabel() }}</span>
         <span v-else-if="backgroundImageInput && backgroundImageInput.files && backgroundImageInput.files[0]" class="ml-2 text-success">已上傳: {{ backgroundImageInput.files[0].name }}</span>
         <button v-if="stockedBackground || (backgroundImageInput && backgroundImageInput.files && backgroundImageInput.files[0])" type="button" class="btn btn-outline-secondary btn-sm ml-2" @click="clearBackground()">清除</button>
@@ -65,38 +65,34 @@
     </div>
 
     <!-- Background Selection Modal -->
-    <div class="modal fade" id="backgroundModal" tabindex="-1" role="dialog" aria-labelledby="backgroundModalLabel" aria-hidden="true" @hidden.bs.modal="modalOpen = false">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="backgroundModalLabel">選擇背景圖片</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+    <div v-if="showBackgroundModal" class="modal-backdrop" @click="closeBackgroundModal">
+      <div class="modal-container" @click.stop>
+        <div class="modal-header">
+          <h5 class="modal-title">選擇背景圖片</h5>
+          <button type="button" class="modal-close" @click="closeBackgroundModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <button type="button" class="btn btn-outline-secondary" @click="selectBackground('')">無背景 (預設)</button>
           </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <button type="button" class="btn btn-outline-secondary" @click="selectBackground('')">無背景 (預設)</button>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">上傳自訂圖片：</label>
-              <input type="file" class="form-control-file" id="backgroundImage" ref="backgroundImageInput" accept="image/*" @change="onFileChange">
-            </div>
-            <hr>
-            <h6>現成背景：</h6>
-            <div v-if="modalOpen" class="stock-backgrounds-grid">
-              <div v-for="bg in stockBackgrounds" :key="bg.value" 
-                   class="stock-bg-item" 
-                   :class="{ selected: stockedBackground === bg.value }"
-                   @click="selectBackground(bg.value)">
-                <img :src="`${baseUrl}stock-backgrounds/${bg.value}`" :alt="bg.label" class="img-thumbnail">
-                <small class="text-center d-block">{{ bg.label }}</small>
-              </div>
+          <div class="mb-3">
+            <label class="form-label">上傳自訂圖片：</label>
+            <input type="file" class="form-control-file" id="backgroundImage" ref="backgroundImageInput" accept="image/*" @change="onFileChange">
+          </div>
+          <hr>
+          <h6>現成背景：</h6>
+          <div class="background-grid">
+            <div v-for="bg in stockBackgrounds" :key="bg.value" 
+                 class="background-item" 
+                 :class="{ selected: stockedBackground === bg.value }"
+                 @click="selectBackground(bg.value)">
+              <img :src="`${baseUrl}stock-backgrounds/${bg.value}`" :alt="bg.label">
+              <small>{{ bg.label }}</small>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
-          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="closeBackgroundModal">關閉</button>
         </div>
       </div>
     </div>
@@ -105,7 +101,7 @@
 
 <script setup lang="ts">
 
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import firebase from 'firebase/app';
 import 'firebase/functions';
 import { Template } from '../modules/pptx/Template';
@@ -120,7 +116,7 @@ const disablePageBreakButton = ref(false)
 const disableMarkerButton = ref(false)
 const backgroundImageInput = ref<HTMLInputElement>()
 const stockedBackground = ref('')
-const modalOpen = ref(false)
+const showBackgroundModal = ref(false)
 
 const stockBackgrounds = [
   { value: '163-1630260_footprints-in-the-sand-wallpaper-footprints-in-the.jpg', label: 'Footprints' },
@@ -391,7 +387,15 @@ const onFileChange = () => {
   stockedBackground.value = '';
 }
 
-const baseUrl = computed(() => import.meta.env.BASE_URL)
+const openBackgroundModal = () => {
+  showBackgroundModal.value = true;
+}
+
+const closeBackgroundModal = () => {
+  showBackgroundModal.value = false;
+}
+
+const baseUrl = ''
 
 defineExpose({name, lyrics, copyright, getBackgroundImageDataUrl})
 </script>
@@ -414,10 +418,6 @@ defineExpose({name, lyrics, copyright, getBackgroundImageDataUrl})
   padding: 5px;
   border-radius: 5px;
   transition: border-color 0.2s;
-}
-
-.stock-bg-item:hover {
-  border: 2px solid #007bff;
 }
 
 .stock-bg-item.selected {
@@ -490,65 +490,16 @@ defineExpose({name, lyrics, copyright, getBackgroundImageDataUrl})
 
 /* Modal improvements */
 .modal-content {
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
 }
 
 .modal-header {
-  border: none;
-  padding: 1.5rem;
+  border-bottom: 1px solid #dee2e6;
 }
 
 .modal-body {
-  padding: 1.5rem;
-}
-
-.stock-backgrounds-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 1rem;
-  max-height: 400px;
-  overflow-y: auto;
   padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-}
-
-.stock-bg-item {
-  cursor: pointer;
-  text-align: center;
-  padding: 0.75rem;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
-  background: white;
-}
-
-.stock-bg-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: var(--primary-color);
-}
-
-.stock-bg-item.selected {
-  border-color: var(--success-color);
-  background: linear-gradient(135deg, #d4edda, #c3e6cb);
-  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
-}
-
-.stock-bg-item img {
-  width: 100%;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 6px;
-  margin-bottom: 0.5rem;
-}
-
-.stock-bg-item small {
-  font-weight: 500;
-  color: var(--dark-text);
 }
 
 @media (max-width: 768px) {
@@ -561,5 +512,112 @@ defineExpose({name, lyrics, copyright, getBackgroundImageDataUrl})
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     max-height: 300px;
   }
+}
+
+/* Modal Styles */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  max-width: 800px;
+  width: 90%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: flex-end;
+  background: #f8f9fa;
+  border-radius: 0 0 8px 8px;
+}
+
+/* Background Grid */
+.background-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.background-item {
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+  background: white;
+}
+
+.background-item.selected {
+  border-color: #28a745;
+  background: #f8f9fa;
+}
+
+.background-item img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.background-item small {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
 }
 </style>
