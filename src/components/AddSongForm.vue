@@ -79,80 +79,83 @@
       </div>
     </div>
 
-    <!-- Enhanced Background Selection Modal -->
-    <div v-if="showBackgroundModal" class="background-modal-overlay" @click="closeBackgroundModal">
-      <div class="background-modal" @click.stop>
-        <div class="modal-header">
-          <h3 class="modal-title">
-            <i class="fas fa-palette me-2"></i>選擇背景圖片
-          </h3>
-          <button type="button" class="modal-close-btn" @click="closeBackgroundModal">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <!-- Quick Actions -->
-          <div class="quick-actions">
-            <button type="button" class="action-btn no-bg-btn" @click="selectNoBackground()">
-              <i class="fas fa-ban"></i>
-              <span>無背景</span>
-            </button>
-            <button type="button" class="action-btn upload-btn" @click="triggerFileUpload()">
-              <i class="fas fa-upload"></i>
-              <span>上傳圖片</span>
-            </button>
-            <input type="file" ref="fileInput" accept="image/*" @change="handleFileUpload" style="display: none;">
-            <input type="file" ref="backgroundImageInput" accept="image/*" @change="handleFileUpload" style="display: none;">
-          </div>
-
-          <!-- Categories -->
-          <div class="categories">
-            <button
-              v-for="category in categories"
-              :key="category.id"
-              class="category-btn"
-              :class="{ active: activeCategory === category.id }"
-              @click="setActiveCategory(category.id)">
-              <i :class="category.icon"></i>
-              {{ category.name }}
+    <!-- Background Modal Teleported to Body -->
+    <Teleport to="body">
+      <!-- Enhanced Background Selection Modal -->
+      <div v-if="showBackgroundModal" class="background-modal-overlay" @click="closeBackgroundModal">
+        <div class="background-modal" @click.stop>
+          <div class="modal-header">
+            <h3 class="modal-title">
+              <i class="fas fa-palette me-2"></i>選擇背景圖片
+            </h3>
+            <button type="button" class="modal-close-btn" @click="closeBackgroundModal">
+              <i class="fas fa-times"></i>
             </button>
           </div>
 
-          <!-- Background Grid -->
-          <div class="backgrounds-container">
-            <div v-if="filteredBackgrounds.length === 0" class="no-results">
-              <i class="fas fa-search"></i>
-              <p>此分類沒有背景圖片</p>
+          <div class="modal-body">
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+              <button type="button" class="action-btn no-bg-btn" @click="selectNoBackground()">
+                <i class="fas fa-ban"></i>
+                <span>無背景</span>
+              </button>
+              <button type="button" class="action-btn upload-btn" @click="triggerFileUpload()">
+                <i class="fas fa-upload"></i>
+                <span>上傳圖片</span>
+              </button>
+              <input type="file" ref="fileInput" accept="image/*" @change="handleFileUpload" style="display: none;">
+              <input type="file" ref="backgroundImageInput" accept="image/*" @change="handleFileUpload" style="display: none;">
             </div>
-            <div v-else class="backgrounds-grid">
-              <div
-                v-for="bg in filteredBackgrounds"
-                :key="bg.value"
-                class="background-card"
-                :class="{ selected: isSelected(bg) }"
-                @click="selectStockBackground(bg)">
-                <div class="background-preview">
-                  <img :src="`${baseUrl}stock-backgrounds/${bg.value}`" :alt="bg.label" @error="handleImageError">
-                  <div class="background-overlay">
-                    <i class="fas fa-check-circle selected-icon"></i>
+
+            <!-- Categories -->
+            <div class="categories">
+              <button
+                v-for="category in categories"
+                :key="category.id"
+                class="category-btn"
+                :class="{ active: activeCategory === category.id }"
+                @click="setActiveCategory(category.id)">
+                <i :class="category.icon"></i>
+                {{ category.name }}
+              </button>
+            </div>
+
+            <!-- Background Grid -->
+            <div class="backgrounds-container">
+              <div v-if="filteredBackgrounds.length === 0" class="no-results">
+                <i class="fas fa-search"></i>
+                <p>此分類沒有背景圖片</p>
+              </div>
+              <div v-else class="backgrounds-grid">
+                <div
+                  v-for="bg in filteredBackgrounds"
+                  :key="bg.value"
+                  class="background-card"
+                  :class="{ selected: isSelected(bg) }"
+                  @click="selectStockBackground(bg)">
+                  <div class="background-preview">
+                    <img :src="`${baseUrl}stock-backgrounds/${bg.value}`" :alt="bg.label" @error="handleImageError">
+                    <div class="background-overlay">
+                      <i class="fas fa-check-circle selected-icon"></i>
+                    </div>
                   </div>
-                </div>
-                <div class="background-info">
-                  <span class="background-name">{{ bg.label }}</span>
-                  <span class="background-category">{{ getCategoryName(bg.category) }}</span>
+                  <div class="background-info">
+                    <span class="background-name">{{ bg.label }}</span>
+                    <span class="background-category">{{ getCategoryName(bg.category) }}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="closeBackgroundModal">取消</button>
-          <button type="button" class="btn btn-primary" @click="confirmSelection()">確定</button>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="closeBackgroundModal">取消</button>
+            <button type="button" class="btn btn-primary" @click="confirmSelection()">確定</button>
+          </div>
         </div>
       </div>
-    </div>
+    </Teleport>
   </form>
 </template>
 
