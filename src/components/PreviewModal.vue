@@ -18,6 +18,12 @@
               <div class="slide-background">
                 <img v-if="backgroundImage" :src="backgroundImage" alt="Background" />
                 <div v-else class="default-background"></div>
+                <!-- Logos -->
+                <img src="/ccma_twc_logo-BqU4bmAt.png" class="logo-ccma" alt="CCMA Logo" />
+                <!-- Note: twc_logo-B0osCU4n.png was not found in public, checking if it exists or if we should use a different one. 
+                     Based on list_dir, only ccma_twc_logo-BqU4bmAt.png is in public. 
+                     Let's check src/modules/pptx/images to see where TWCLogo comes from. -->
+                <img src="/twc_logo.png" class="logo-twc" alt="TWC Logo" />
               </div>
 
               <!-- Overlay (for text readability if needed, based on template) -->
@@ -125,7 +131,7 @@ const getStyle = (coords: any): CSSProperties => {
     justifyContent: 'center',
     textAlign: 'center',
     color: '#FFFFFF',
-    fontSize: '1.5rem', // Scale down for preview
+    fontSize: `${(coords.fontSize || 36) * 0.5}px`, // Scale down for preview (approx 50% of PPT size)
     fontWeight: 'bold',
     textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
     whiteSpace: 'pre-wrap'
@@ -296,6 +302,30 @@ const slides = computed(() => {
   height: 100%;
   background: #0000FF;
   /* Fallback blue */
+}
+
+.logo-ccma {
+  position: absolute;
+  top: 3%;
+  left: 3%;
+  /* PPTGenerator: w: 0.98 inches, h: 0.98 inches */
+  /* Standard PPT 16:9 is 10" x 5.625" */
+  /* 0.98 inches / 10 inches = 9.8% of width */
+  width: 9.8%;
+  height: auto;
+  z-index: 1;
+}
+
+.logo-twc {
+  position: absolute;
+  top: 5%;
+  right: 3%;
+  /* PPTGenerator: x: '85%' means 85% from left, so 15% from right, minus half width */
+  /* PPTGenerator: w: (186/104)*0.7 ≈ 1.25 inches, h: 0.7 inches */
+  /* 1.25 inches / 10 inches = 12.5% of width */
+  width: 12.5%;
+  height: auto;
+  z-index: 1;
 }
 
 .slide-content {
