@@ -18,13 +18,11 @@
               <div class="slide-background">
                 <img v-if="backgroundImage" :src="backgroundImage" alt="Background" />
                 <div v-else class="default-background"></div>
-                <!-- Logos -->
-                <img src="/ccma_twc_logo-BqU4bmAt.png" class="logo-ccma" alt="CCMA Logo" />
-                <!-- Note: twc_logo-B0osCU4n.png was not found in public, checking if it exists or if we should use a different one. 
-                     Based on list_dir, only ccma_twc_logo-BqU4bmAt.png is in public. 
-                     Let's check src/modules/pptx/images to see where TWCLogo comes from. -->
-                <img src="/twc_logo.png" class="logo-twc" alt="TWC Logo" />
               </div>
+
+              <!-- Logos (outside background so they position relative to slide) -->
+              <img src="/ccma_twc_logo-BqU4bmAt.png" class="logo-ccma" alt="CCMA Logo" />
+              <img src="/twc_logo.png" class="logo-twc" alt="TWC Logo" />
 
               <!-- Overlay (for text readability if needed, based on template) -->
               <div v-if="template.lyricsBackgroundTransparency < 100" class="text-overlay" :style="overlayStyle">
@@ -34,17 +32,17 @@
               <div class="slide-content">
                 <!-- Song Cover Slide -->
                 <div v-if="slide.type === 'cover'" class="cover-content">
-                  <div class="song-name" :style="getStyle(template.songNameCoords)">
+                  <div class="song-name" :style="getStyle(template.songNameCoords, 36)">
                     【{{ name }}】
                   </div>
-                  <div v-if="copyright" class="copyright" :style="getStyle(template.copyrightCoords)">
+                  <div v-if="copyright" class="copyright" :style="getStyle(template.copyrightCoords, 24)">
                     {{ copyright }}
                   </div>
                 </div>
 
                 <!-- Lyrics Slide -->
                 <div v-else class="lyrics-content">
-                  <div v-if="slide.marker" class="marker" :style="getStyle(template.markerCoords)">
+                  <div v-if="slide.marker" class="marker" :style="getStyle(template.markerCoords, 22)">
                     {{ slide.marker }}
                   </div>
                   <div class="lyrics-text" :style="getLyricsStyle(slide)">
@@ -118,8 +116,14 @@ const overlayStyle = computed((): CSSProperties => {
   }
 })
 
-const getStyle = (coords: any): CSSProperties => {
+const getStyle = (coords: any, fontSize: number = 36): CSSProperties => {
   if (!coords) return {}
+  // PPT uses points, we need to scale to pixels for preview
+  // Standard conversion: 1pt ≈ 1.33px at 96 DPI
+  // But for preview, we scale down based on typical preview container size
+  // Assuming preview slide is ~800px wide vs PPT 10 inches at 96 DPI = 960px
+  // Scale factor: 800/960 ≈ 0.83
+  const scaleFactor = 0.83
   return {
     position: 'absolute',
     left: coords.x,
@@ -131,7 +135,7 @@ const getStyle = (coords: any): CSSProperties => {
     justifyContent: 'center',
     textAlign: 'center',
     color: '#FFFFFF',
-    fontSize: `${(coords.fontSize || 36) * 0.5}px`, // Scale down for preview (approx 50% of PPT size)
+    fontSize: `${fontSize * 1.33 * scaleFactor}px`, // pt to px conversion with scaling
     fontWeight: 'bold',
     textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
     whiteSpace: 'pre-wrap'
@@ -139,13 +143,8 @@ const getStyle = (coords: any): CSSProperties => {
 }
 
 const getLyricsStyle = (slide: any): CSSProperties => {
-  const baseStyle = getStyle(template.value.lyricsCoords)
+  const baseStyle = getStyle(template.value.lyricsCoords, 36) // Lyrics use 36pt
   if (slide.marker && template.value.markerCoords) {
-    // Adjust Y if marker exists, similar to PPTGenerator
-    // In PPTGenerator: y = markerHeight + lyricsCoords.y
-    // We can try to approximate this or just let them stack if we use flexbox inside a container?
-    // But here we are using absolute positioning.
-    // Let's just add the marker height to the top.
     const markerH = parseFloat(template.value.markerCoords.h as string)
     const currentY = parseFloat(template.value.lyricsCoords.y as string)
     baseStyle.top = `${markerH + currentY}%`
@@ -309,10 +308,12 @@ const slides = computed(() => {
   top: 3%;
   left: 3%;
   /* PPTGenerator: w: 0.98 inches, h: 0.98 inches */
-  /* Standard PPT 16:9 is 10" x 5.625" */
-  /* 0.98 inches / 10 inches = 9.8% of width */
-  width: 9.8%;
-  height: auto;
+  /* PPT slide is 10" wide at 96 DPI = 960px */
+  /* Preview slide is ~800px wide (scale factor 0.83) */
+  /* 0.98 inches * 96 DPI * 0.83 = ~78px */
+  width: 78px;
+  height: 78px;
+  object-fit: contain;
   z-index: 1;
 }
 
@@ -320,11 +321,12 @@ const slides = computed(() => {
   position: absolute;
   top: 5%;
   right: 3%;
-  /* PPTGenerator: x: '85%' means 85% from left, so 15% from right, minus half width */
   /* PPTGenerator: w: (186/104)*0.7 ≈ 1.25 inches, h: 0.7 inches */
-  /* 1.25 inches / 10 inches = 12.5% of width */
-  width: 12.5%;
-  height: auto;
+  /* 1.25 inches * 96 DPI * 0.83 ≈ 100px width */
+  /* 0.7 inches * 96 DPI * 0.83 ≈ 56px height */
+  width: 100px;
+  height: 56px;
+  object-fit: contain;
   z-index: 1;
 }
 
