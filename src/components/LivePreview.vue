@@ -185,8 +185,18 @@ const getStyle = (coords: any, fontSizePt: number = 36): CSSProperties => {
     textAlign: 'center',
     color: '#FFFFFF',
     fontSize: `${fontSizePx}px`,
-    fontWeight: 'bold',
-    textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+    fontWeight: 600, // Semi-bold instead of bold for better readability
+    // Simulate PPT glow and shadow effects with multiple text-shadows
+    // Glow effect (black, size 10px, opacity 1.0) - matches PPT exactly
+    // Outer shadow (gray, 45-degree angle, offset 3px, blur 3px, reduced opacity)
+    textShadow: `
+      0px 0px 0px rgba(0,0,0,1.0),
+      0px 0px 5px rgba(0,0,0,1.0),
+      0px 0px 10px rgba(0,0,0,1.0),
+      0px 0px 15px rgba(0,0,0,0.8),
+      0px 0px 20px rgba(0,0,0,0.6),
+      3px 3px 6px rgba(127,127,127,0.25)
+    `,
     whiteSpace: 'pre-wrap'
   }
 }

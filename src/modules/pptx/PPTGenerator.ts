@@ -126,7 +126,6 @@ function addSlide(pres:pptxgen, text:string, template:Template, masterName:strin
   }
 
   let markerHeight = 0;
-  console.log(`WTF: "${text}`)
   if (text.match(/^[a-zA-Z]/) && template.markerCoords) {
 
     slide.addText(markers[text.charAt(0)], {
