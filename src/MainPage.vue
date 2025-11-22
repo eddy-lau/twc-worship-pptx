@@ -30,7 +30,7 @@
               <div class="template-options">
                 <div v-for="(t, i) in templates" :key="i" class="template-option">
                   <input class="form-check-input" type="radio" :value="t" v-model="template" :id="`template${i}`">
-                  <label class="form-check-label" :for="`template${i}`">
+                  <label class="form-check-label template-label" :for="`template${i}`">
                     <strong>{{t.name}}</strong>
                     <small class="text-muted d-block">{{t.description || '詩歌PPT模板'}}</small>
                   </label>
@@ -225,14 +225,28 @@ const download = async () => {
 .template-option {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
-  padding: 0.75rem;
+  gap: 0.75rem;
+  padding: 1rem 1rem 1rem 2rem;
   border: 2px solid #e9ecef;
   border-radius: 8px;
   transition: all 0.2s ease;
   cursor: pointer;
   flex: 1;
   min-width: 200px;
+  position: relative;
+}
+
+.template-option input[type="radio"] {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+}
+
+.template-label {
+  margin-left: 0.5rem;
+  cursor: pointer;
 }
 
 .template-option:hover {
