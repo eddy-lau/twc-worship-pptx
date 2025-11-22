@@ -179,6 +179,7 @@ const lyricsElement = ref<HTMLTextAreaElement | null>(null)
 const disablePageBreakButton = ref(false)
 const disableMarkerButton = ref(false)
 const backgroundImageInput = ref<HTMLInputElement>()
+const uploadedFile = ref<File | null>(null)
 const stockedBackground = ref('')
 const showBackgroundModal = ref(false)
 const showPreviewModal = ref(false)
@@ -187,7 +188,7 @@ const activeCategory = ref('all')
 const fileInput = ref<HTMLInputElement>()
 
 // Watch for background changes and update preview
-watch([stockedBackground, backgroundImageInput], async () => {
+watch([stockedBackground, uploadedFile], async () => {
   try {
     const bg = await getBackgroundImageDataUrl()
     previewBackgroundImage.value = bg || ''
@@ -195,7 +196,7 @@ watch([stockedBackground, backgroundImageInput], async () => {
     console.error('Failed to load background for preview', e)
     previewBackgroundImage.value = ''
   }
-}, { deep: true })
+})
 
 
 // Enhanced background data with categories
@@ -242,9 +243,8 @@ const selectedBackground = computed(() => {
     const bg = stockBackgrounds.find(b => b.value === stockedBackground.value)
     return bg ? { type: 'stock', value: bg.value, label: bg.label, name: bg.label } : null
   }
-  if (backgroundImageInput.value && backgroundImageInput.value.files && backgroundImageInput.value.files[0]) {
-    const file = backgroundImageInput.value.files[0]
-    return { type: 'custom', value: file, label: file.name, name: file.name }
+  if (uploadedFile.value) {
+    return { type: 'custom', value: uploadedFile.value, label: uploadedFile.value.name, name: uploadedFile.value.name }
   }
   return null
 })
@@ -432,8 +432,8 @@ const getBackgroundImageDataUrl = async (): Promise<string | undefined> => {
   if (stockedBackground.value) {
     return `${import.meta.env.BASE_URL}stock-backgrounds/${stockedBackground.value}`;
   }
-  if (backgroundImageInput.value && backgroundImageInput.value.files && backgroundImageInput.value.files[0]) {
-    const file = backgroundImageInput.value.files[0];
+  if (uploadedFile.value) {
+    const file = uploadedFile.value;
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -472,6 +472,7 @@ const getBackgroundImageDataUrl = async (): Promise<string | undefined> => {
 
 const selectNoBackground = () => {
   stockedBackground.value = '';
+  uploadedFile.value = null;
   if (backgroundImageInput.value) {
     backgroundImageInput.value.value = '';
   }
@@ -479,22 +480,27 @@ const selectNoBackground = () => {
 
 const selectStockBackground = (bg: any) => {
   stockedBackground.value = bg.value;
+  uploadedFile.value = null;
   if (backgroundImageInput.value) {
     backgroundImageInput.value.value = '';
   }
 }
 
 const triggerFileUpload = () => {
-  if (fileInput.value) {
-    fileInput.value.click();
+  if (backgroundImageInput.value) {
+    backgroundImageInput.value.click();
   }
 }
 
 const handleFileUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files[0]) {
+    uploadedFile.value = target.files[0];
+    // Clear stock selection when uploading file
     stockedBackground.value = '';
-    // The file will be handled by the existing backgroundImageInput ref
+
+    // Close the modal after successful upload
+    showBackgroundModal.value = false;
   }
 }
 
@@ -518,6 +524,7 @@ const handleImageError = (event: Event) => {
 
 const clearBackground = () => {
   stockedBackground.value = '';
+  uploadedFile.value = null;
   if (backgroundImageInput.value) {
     backgroundImageInput.value.value = '';
   }
