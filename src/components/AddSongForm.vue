@@ -51,7 +51,7 @@
     <div class="form-group">
       <label>背景圖片 (可選)</label>
       <div class="d-flex align-items-center mb-2">
-        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#backgroundModal">選擇背景</button>
+        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#backgroundModal" @click="modalOpen = true">選擇背景</button>
         <span v-if="stockedBackground" class="ml-2 text-success">已選擇: {{ getSelectedLabel() }}</span>
         <span v-else-if="backgroundImageInput && backgroundImageInput.files && backgroundImageInput.files[0]" class="ml-2 text-success">已上傳: {{ backgroundImageInput.files[0].name }}</span>
         <button v-if="stockedBackground || (backgroundImageInput && backgroundImageInput.files && backgroundImageInput.files[0])" type="button" class="btn btn-outline-secondary btn-sm ml-2" @click="clearBackground()">清除</button>
@@ -59,7 +59,7 @@
     </div>
 
     <!-- Background Selection Modal -->
-    <div class="modal fade" id="backgroundModal" tabindex="-1" role="dialog" aria-labelledby="backgroundModalLabel" aria-hidden="true">
+    <div class="modal fade" id="backgroundModal" tabindex="-1" role="dialog" aria-labelledby="backgroundModalLabel" aria-hidden="true" @hidden.bs.modal="modalOpen = false">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -78,12 +78,12 @@
             </div>
             <hr>
             <h6>現成背景：</h6>
-            <div class="stock-backgrounds-grid">
+            <div v-if="modalOpen" class="stock-backgrounds-grid">
               <div v-for="bg in stockBackgrounds" :key="bg.value" 
                    class="stock-bg-item" 
                    :class="{ selected: stockedBackground === bg.value }"
                    @click="selectBackground(bg.value)">
-                                <img :src="`${baseUrl}stock-backgrounds/${bg.value}`" :alt="bg.label" class="img-thumbnail">
+                <img :src="`${baseUrl}stock-backgrounds/${bg.value}`" :alt="bg.label" class="img-thumbnail">
                 <small class="text-center d-block">{{ bg.label }}</small>
               </div>
             </div>
@@ -114,6 +114,7 @@ const disablePageBreakButton = ref(false)
 const disableMarkerButton = ref(false)
 const backgroundImageInput = ref<HTMLInputElement>()
 const stockedBackground = ref('')
+const modalOpen = ref(false)
 
 const stockBackgrounds = [
   { value: '163-1630260_footprints-in-the-sand-wallpaper-footprints-in-the.jpg', label: 'Footprints' },
