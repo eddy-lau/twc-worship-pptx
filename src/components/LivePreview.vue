@@ -85,6 +85,7 @@
 <script setup lang="ts">
 import { computed, toRefs, CSSProperties, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { Template } from '../modules/pptx/Template'
+import { LyricsParser, SlideData } from '../modules/LyricsParser'
 
 const props = defineProps<{
   name: string
@@ -211,79 +212,8 @@ const getLyricsStyle = (slide: any): CSSProperties => {
   return baseStyle
 }
 
-const slides = computed(() => {
-  const result: any[] = []
-  const PAGE_BREAK = '--page-break--'
-
-  // 1. Cover Slide
-  result.push({ type: 'cover' })
-
-  // 2. Lyrics Slides
-  if (!lyrics.value) return result
-
-  let lines = lyrics.value.split('\n')
-    .map(line => line.trim())
-    .map(line => line.length === 0 ? PAGE_BREAK : line)
-    .filter(line => line.length > 0)
-
-  let lineCount = 0
-  let text = ''
-
-  const addSlide = (txt: string) => {
-    const markers: { [key: string]: string } = {
-      'b': 'Bridge', 'B': 'Bridge',
-      'c': '副歌', 'C': '副歌'
-    }
-
-    let marker = ''
-    let content = txt
-
-    if (txt.match(/^[a-zA-Z]/) && template.value.markerCoords) {
-      const char = txt.charAt(0)
-      if (markers[char]) {
-        marker = markers[char]
-        content = txt.replace(/^[a-zA-Z]/, '')
-      }
-    }
-
-    result.push({
-      type: 'lyrics',
-      text: content,
-      marker
-    })
-  }
-
-  for (const line of lines) {
-    if (line === PAGE_BREAK) {
-      if (text) {
-        addSlide(text)
-      }
-      text = ''
-      lineCount = 0
-      continue
-    }
-
-    if (line.match(/^[\d副a-zA-Z]/) || lineCount == template.value.maxLinesPerSlide) {
-      if (text) {
-        addSlide(text)
-      }
-      text = ''
-      lineCount = 0
-    }
-
-    if (lineCount == 0) {
-      text = line
-    } else {
-      text += '\n' + line
-    }
-    lineCount++
-  }
-
-  if (text) {
-    addSlide(text)
-  }
-
-  return result
+const slides = computed((): SlideData[] => {
+  return LyricsParser.parseLyricsToSlides(lyrics.value, template.value);
 })
 
 </script>

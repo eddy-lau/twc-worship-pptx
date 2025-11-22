@@ -3,6 +3,7 @@ import pptxgen from "pptxgenjs";
 import CCMALogo from './images/ccma_twc_logo.png';
 import TWCLogo from './images/twc_logo.png';
 import { Template } from "./Template";
+import { LyricsParser } from "../LyricsParser";
 
 function addPresentationCover(pres:pptxgen, template:Template) {
 
@@ -114,21 +115,13 @@ function addSongCover(pres:pptxgen, name:string, copyright:string|undefined, tem
 
 }
 
-function addSlide(pres:pptxgen, text:string, template:Template, masterName:string) {
+function addSlide(pres:pptxgen, text:string, marker:string, template:Template, masterName:string) {
 
   let slide = newSlideTemplate(pres, masterName);
 
-  const markers:{[key:string]:string} = {
-    'b': 'Bridge',
-    'B': 'Bridge',
-    'c': '副歌',
-    'C': '副歌'
-  }
-
   let markerHeight = 0;
-  if (text.match(/^[a-zA-Z]/) && template.markerCoords) {
-
-    slide.addText(markers[text.charAt(0)], {
+  if (marker && template.markerCoords) {
+    slide.addText(marker, {
       ...template.markerCoords,
       align: 'center',
       shrinkText: true,
@@ -141,10 +134,7 @@ function addSlide(pres:pptxgen, text:string, template:Template, masterName:strin
       lang: 'zh-HK'
     });
 
-    text = text.replace(/^[a-zA-Z]/, '')
-    markerHeight = parseFloat(`${template.markerCoords.h}`)
-  } else {
-    console.log('WTF2!!', text, text.match(/^[a-zA-Z]/), template.markerCoords)
+    markerHeight = parseFloat(`${template.markerCoords.h}`);
   }
 
   slide.addText(text, {
@@ -164,50 +154,17 @@ function addSlide(pres:pptxgen, text:string, template:Template, masterName:strin
 
 function addSong(pres:pptxgen, name:string, copyright:string|undefined, lyrics:string, template:Template, masterName:string) {
 
-  const PAGE_BREAK='--page-break--'
-
   addSongCover(pres, name, copyright, template, masterName);
 
-  let lines = lyrics.split('\n')
-  .map( line => line.trim() )
-  .map( line => line.length === 0 ? PAGE_BREAK : line )
-  .filter( line => line.length > 0 );
+  // Parse lyrics into slides using the shared parser
+  const slides = LyricsParser.parseLyricsToSlides(lyrics, template);
 
-  let lineCount = 0;
-  let text;
-  for (const line of lines) {
-
-    if (line === PAGE_BREAK) {
-      if (text) {
-        addSlide(pres, text, template, masterName);
-      }
-      text = "";
-      lineCount = 0;
-      continue;
+  // Add each lyrics slide (skip the cover slide as it's already added)
+  for (const slide of slides) {
+    if (slide.type === 'lyrics' && slide.text) {
+      addSlide(pres, slide.text, slide.marker || '', template, masterName);
     }
-
-    if (line.match(/^[\d副a-zA-Z]/) || lineCount == template.maxLinesPerSlide) {
-      if (text) {
-        addSlide(pres, text, template, masterName);
-      }
-      text = "";
-      lineCount = 0;
-    }
-
-    if (lineCount == 0) {
-      text = line;
-    } else {
-      text += '\n';
-      text += line;
-    }
-    lineCount++;
-
   }
-
-  if (text) {
-    addSlide(pres, text, template, masterName);
-  }
-
 }
 
 export class PPTGenerator {
