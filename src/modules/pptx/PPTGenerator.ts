@@ -43,7 +43,15 @@ function createMasterSlide(pres:pptxgen, title:string, template:Template, backgr
 
   let backgroundObj: any = {};
   if (backgroundImage) {
-    backgroundObj = { path: backgroundImage };
+    if (backgroundImage.startsWith('data:')) {
+      // Handle data URL
+      const [mime, base64] = backgroundImage.split(',');
+      const mimeType = mime.split(':')[1].split(';')[0]; // e.g., 'image/jpeg'
+      const type = mimeType.split('/')[1] === 'jpeg' ? 'jpg' : mimeType.split('/')[1];
+      backgroundObj = { data: base64, type };
+    } else {
+      backgroundObj = { path: backgroundImage };
+    }
   } else {
     backgroundObj = { fill: '0000FF' };
   }
