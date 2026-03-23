@@ -1,13 +1,14 @@
-const CACHE_NAME = 'twc-worship-pptx-v1';
+const APP_BASE = '/twc-worship-pptx';
+const CACHE_NAME = 'twc-worship-pptx-v2';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/ccma_twc_logo-BqU4bmAt.png'
+  `${APP_BASE}/`,
+  `${APP_BASE}/index.html`,
+  `${APP_BASE}/manifest.json`
 ];
 
 // Install event - cache resources
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -16,12 +17,35 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Fetch event - serve from cache when offline
+// Fetch event - prefer fresh HTML so new deploys pick up the latest bundle.
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
+  const requestUrl = new URL(event.request.url);
+  const isAppRequest = requestUrl.pathname.startsWith(APP_BASE);
+  const isNavigationRequest = event.request.mode === 'navigate';
+  const isHtmlRequest = event.request.headers.get('accept')?.includes('text/html');
+
+  if (isAppRequest && (isNavigationRequest || isHtmlRequest)) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((response) => response || caches.match(`${APP_BASE}/index.html`)))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Return cached version or fetch from network
         return response || fetch(event.request);
       })
   );
@@ -29,6 +53,7 @@ self.addEventListener('fetch', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(

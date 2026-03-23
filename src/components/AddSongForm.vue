@@ -60,7 +60,7 @@
           <div v-if="selectedBackground" class="selected-background">
             <div class="selected-preview">
               <img v-if="selectedBackground.type === 'stock'"
-                :src="`${baseUrl}stock-backgrounds/${selectedBackground.value}`" alt="Selected background">
+                :src="getStockBackgroundUrl(String(selectedBackground.value))" alt="Selected background">
               <div v-else class="custom-image-placeholder">
                 <i class="fas fa-image"></i>
                 <span>{{ selectedBackground.name }}</span>
@@ -125,7 +125,7 @@
                   <div v-for="bg in filteredBackgrounds" :key="bg.value" class="background-card"
                     :class="{ selected: isSelected(bg) }" @click="selectStockBackground(bg)">
                     <div class="background-preview">
-                      <img :src="`${baseUrl}stock-backgrounds/${bg.value}`" :alt="bg.label" @error="handleImageError">
+                      <img :src="getStockBackgroundUrl(bg.value)" :alt="bg.label" @error="handleImageError">
                       <div class="background-overlay">
                         <i class="fas fa-check-circle selected-icon"></i>
                       </div>
@@ -187,6 +187,8 @@ const previewBackgroundImage = ref<string>('')
 const activeCategory = ref('all')
 const fileInput = ref<HTMLInputElement>()
 
+type BackgroundCategory = 'nature' | 'abstract' | 'worship' | 'animated'
+
 // Watch for background changes and update preview
 watch([stockedBackground, uploadedFile], async () => {
   try {
@@ -208,27 +210,106 @@ const categories = [
   { id: 'animated', name: '動畫', icon: 'fas fa-play-circle' }
 ]
 
-const stockBackgrounds = [
-  { value: '163-1630260_footprints-in-the-sand-wallpaper-footprints-in-the.jpg', label: 'Footprints', category: 'nature' },
-  { value: '41dNG1AgmIL._SX425_.jpg', label: 'Abstract Blue', category: 'abstract' },
-  { value: '640.jpg', label: 'Gradient BG', category: 'abstract' },
-  { value: '9c58d46316e99cbe14be3ca4d74ebdae.jpg', label: 'Forest Path', category: 'nature' },
-  { value: 'GetMedia.jpg', label: 'Media BG', category: 'abstract' },
-  { value: 'Grok Image 2025-04-12 at 7.38.48 PM.png', label: 'Grok Art', category: 'abstract' },
-  { value: 'Picture1.jpg', label: 'Church Scene', category: 'worship' },
-  { value: 'Picture10.jpg', label: 'Worship Hall', category: 'worship' },
-  { value: 'Picture11.jpg', label: 'Sanctuary', category: 'worship' },
-  { value: 'Picture4.jpg', label: 'Cross Light', category: 'worship' },
-  { value: 'Picture6.jpg', label: 'Prayer', category: 'worship' },
-  { value: 'Picture7.jpg', label: 'Altar', category: 'worship' },
-  { value: 'Picture8.jpg', label: 'Chapel', category: 'worship' },
-  { value: 'Picture9.jpg', label: 'Worship Space', category: 'worship' },
-  { value: 'animated01.gif', label: 'Animated 1', category: 'animated' },
-  { value: 'animated02.gif', label: 'Animated 2', category: 'animated' },
-  { value: 'hd-road-editing-background-11560093640sgzwr0aeo0.jpg', label: 'HD Road', category: 'nature' },
-  { value: 'itl.cat_wallpapersafari_248797.png', label: 'Cat', category: 'nature' },
-  { value: 'worship2.jpg', label: 'Worship 2', category: 'worship' }
+const stockBackgroundFiles = [
+  '1.jpg',
+  '163-1630260_footprints-in-the-sand-wallpaper-footprints-in-the.jpg',
+  '2.jpg',
+  '41dNG1AgmIL._SX425_.jpg',
+  '45+ Worship backgrounds ·① Download free cool HD backgrounds for desktop computers and smartphones in any resolution_ desktop, Android, iPhone, iPad 1920x1080, 320x480, 1680x1050, 1280x900 etc_ WallpaperTag.jpg',
+  '5.jpg',
+  '6.jpg',
+  '640.jpg',
+  '9c58d46316e99cbe14be3ca4d74ebdae.jpg',
+  'GetMedia.jpg',
+  'Grok Image 2025-04-12 at 7.38.48 PM.jpg',
+  'Grok Image 2025-04-12 at 7.38.48 PM.png',
+  'Heart to Heart.jpg',
+  'Picture1.jpg',
+  'Picture10.jpg',
+  'Picture11.jpg',
+  'Picture4.jpg',
+  'Picture6.jpg',
+  'Picture7.jpg',
+  'Picture8.jpg',
+  'Picture9.jpg',
+  'The Grape Vine.jpg',
+  'WallpaperSafari.jpg',
+  'Worship Backgrounds - Crown of Thorn Good Friday.jpg',
+  "You're a mountain that the sun rises over- I'm the sky that holds you both_..jpg",
+  'a.jpg',
+  'animated01.gif',
+  'animated02.gif',
+  'hd-road-editing-background-11560093640sgzwr0aeo0.jpg',
+  'itl.cat_wallpapersafari_248797.png',
+  'sunrise.jpg',
+  'worship2.jpg'
 ]
+
+const backgroundLabelOverrides: Record<string, string> = {
+  '163-1630260_footprints-in-the-sand-wallpaper-footprints-in-the.jpg': 'Footprints In The Sand',
+  '41dNG1AgmIL._SX425_.jpg': 'Abstract Blue',
+  '45+ Worship backgrounds ·① Download free cool HD backgrounds for desktop computers and smartphones in any resolution_ desktop, Android, iPhone, iPad 1920x1080, 320x480, 1680x1050, 1280x900 etc_ WallpaperTag.jpg': 'Worship Backgrounds',
+  '9c58d46316e99cbe14be3ca4d74ebdae.jpg': 'Forest Path',
+  'GetMedia.jpg': 'Get Media',
+  'Grok Image 2025-04-12 at 7.38.48 PM.jpg': 'Grok Image JPG',
+  'Grok Image 2025-04-12 at 7.38.48 PM.png': 'Grok Image PNG',
+  'Heart to Heart.jpg': 'Heart To Heart',
+  'The Grape Vine.jpg': 'The Grape Vine',
+  'WallpaperSafari.jpg': 'Wallpaper Safari',
+  'Worship Backgrounds - Crown of Thorn Good Friday.jpg': 'Crown Of Thorn Good Friday',
+  "You're a mountain that the sun rises over- I'm the sky that holds you both_..jpg": 'Mountain Sunrise',
+  'a.jpg': 'Abstract A',
+  'hd-road-editing-background-11560093640sgzwr0aeo0.jpg': 'HD Road',
+  'itl.cat_wallpapersafari_248797.png': 'Wallpaper Safari 2',
+  'sunrise.jpg': 'Sunrays Sunrise',
+  'worship2.jpg': 'Worship 2'
+}
+
+const worshipKeywords = ['worship', 'church', 'chapel', 'sanctuary', 'altar', 'prayer', 'cross', 'crown', 'thorn', 'grape', 'heart']
+const natureKeywords = ['nature', 'landscape', 'sun', 'sunrise', 'sunset', 'sunrays', 'mountain', 'sky', 'forest', 'road', 'footprints', 'wallpaper', 'outdoors']
+
+const formatBackgroundLabel = (fileName: string) => {
+  const override = backgroundLabelOverrides[fileName]
+  if (override) {
+    return override
+  }
+
+  return fileName
+    .replace(/\.[^.]+$/, '')
+    .replace(/[_#.+-]+/g, ' ')
+    .replace(/([a-zA-Z])(\d)/g, '$1 $2')
+    .replace(/(\d)([a-zA-Z])/g, '$1 $2')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+const inferBackgroundCategory = (fileName: string): BackgroundCategory => {
+  const normalizedName = fileName.toLowerCase()
+
+  if (normalizedName.endsWith('.gif') || normalizedName.includes('animated')) {
+    return 'animated'
+  }
+
+  if (worshipKeywords.some(keyword => normalizedName.includes(keyword)) || /^picture\d+/i.test(fileName)) {
+    return 'worship'
+  }
+
+  if (natureKeywords.some(keyword => normalizedName.includes(keyword))) {
+    return 'nature'
+  }
+
+  return 'abstract'
+}
+
+const stockBackgrounds = stockBackgroundFiles.map(fileName => ({
+  value: fileName,
+  label: formatBackgroundLabel(fileName),
+  category: inferBackgroundCategory(fileName)
+}))
+
+const getStockBackgroundUrl = (fileName: string) => {
+  return `${import.meta.env.BASE_URL}stock-backgrounds/${encodeURIComponent(fileName)}`
+}
 
 // Computed properties
 const filteredBackgrounds = computed(() => {
@@ -430,7 +511,7 @@ function addMarker(marker: string) {
 
 const getBackgroundImageDataUrl = async (): Promise<string | undefined> => {
   if (stockedBackground.value) {
-    return `${import.meta.env.BASE_URL}stock-backgrounds/${stockedBackground.value}`;
+    return getStockBackgroundUrl(stockedBackground.value);
   }
   if (uploadedFile.value) {
     const file = uploadedFile.value;
@@ -541,8 +622,6 @@ const closeBackgroundModal = () => {
 const confirmSelection = () => {
   showBackgroundModal.value = false;
 }
-
-const baseUrl = ''
 
 defineExpose({ name, lyrics, copyright, getBackgroundImageDataUrl })
 </script>
